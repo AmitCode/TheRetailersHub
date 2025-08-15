@@ -9,6 +9,12 @@ import java.util.List;
 
 @Component
 public class AddressModelMapper {
+    /**
+     * Maps an Address object to an AddressDTO object.
+     *
+     * @param address The Address object to be mapped.
+     * @return The mapped AddressDTO object.
+     */
     public AddressDTO mapToAddressDTO(Address address){
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setAddressId(address.getAddressId());
@@ -25,6 +31,12 @@ public class AddressModelMapper {
         return addressDTO;
     }
 
+    /**
+     * Maps an AddressDTO object to an Address object.
+     *
+     * @param addressDTO The AddressDTO object to be mapped.
+     * @return The mapped Address object.
+     */
     public Address mapToAddress(AddressDTO addressDTO){
         Address address = new Address();
         address.setAddressId(addressDTO.getAddressId());
@@ -42,6 +54,12 @@ public class AddressModelMapper {
     }
 
 
+    /**
+     * Maps a List of Address objects to an ArrayList of AddressDTO objects.
+     *
+     * @param addressList The List of Address objects to be mapped.
+     * @return The ArrayList of AddressDTO objects resulting from the mapping.
+     */
     public ArrayList<AddressDTO> mapToAddressDTOList(List<Address> addressList){
         ArrayList<AddressDTO> addressDTOList = new ArrayList<>();
         for(Address address : addressList){

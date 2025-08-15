@@ -23,6 +23,13 @@ public class AddressServiceImpl implements AddressService {
         this.addressModelMapper = addressModelMapper;
     }
 
+
+    /**
+     * This method is used to add a new address to the database.
+     *
+     * @param addressDTO The {@link AddressDTO} object containing the details of the address to be added.
+     * @return A string indicating that the address has been created successfully.
+     */
     @Override
     public String addNewAddress(AddressDTO addressDTO){
         Address address = addressRepository.save(addressModelMapper.
@@ -48,12 +55,25 @@ public class AddressServiceImpl implements AddressService {
         return addressModelMapper.mapToAddressDTO(exitingAddress);
     }
 
+    /**
+     * This method is used to delete an existing address from the database.
+     *
+     * @param addressId The ID of the address to be deleted.
+     * @return A string indicating that the address has been deleted successfully.
+     */
     @Override
     public String deleteExistingAddress(Long addressId) {
         addressRepository.deleteById(addressId);
         return "address has been deleted!...";
     }
 
+    /**
+     * This method is used to modify the active status of an address.
+     *
+     * @param addressId The ID of the address whose active status is to be modified.
+     * @param isActive The new active status of the address. Must be either "Y" or "N".
+     * @return An {@link AddressDTO} object representing the updated address with its active status changed.
+     */
     @Override
     public AddressDTO modifyActiveStatusOfAddress(Long addressId, String isActive) {
         Address address = AddressUtils.isAddressExist(addressId,addressRepository);
@@ -62,12 +82,24 @@ public class AddressServiceImpl implements AddressService {
         return addressModelMapper.mapToAddressDTO(newAddress);
     }
 
+    /**
+     * This method is used to get the list of addresses associated with a user.
+     *
+     * @param userId The userId of the user whose addresses are to be fetched.
+     * @return An ArrayList of {@link AddressDTO} objects representing the addresses associated with the user.
+     */
     @Override
     public ArrayList<AddressDTO> getAddressByUserId(Long userId) {
         List<Address> addressList = addressRepository.findByAddressUserId(userId);
         return addressModelMapper.mapToAddressDTOList(addressList);
     }
 
+    /**
+     * This method is used to get the details of an address by its ID.
+     *
+     * @param addressId The ID of the address to be fetched.
+     * @return An {@link AddressDTO} object representing the address with all its details.
+     */
     @Override
     public AddressDTO getAddressById(Long addressId) {
         Address address = AddressUtils.isAddressExist(addressId,addressRepository);
@@ -75,6 +107,13 @@ public class AddressServiceImpl implements AddressService {
 
     }
 
+    /**
+     * This method is used to make an address as primary address.
+     *
+     * @param addressId The ID of the address to be made as primary.
+     * @return An ArrayList of {@link AddressDTO} objects representing the updated address
+     *         of the user.
+     */
     @Override
     public ArrayList<AddressDTO> makeAddressAsPrimary(Long addressId) {
         Address address = AddressUtils.isAddressExist(addressId,addressRepository);

@@ -22,6 +22,12 @@ public class SupplierServiceImpl implements SupplierService {
         this.suppliersUtils = suppliersUtils;
     }
 
+    /**
+     * This method is used to add new supplier into the database.
+     *
+     * @param supplierDTO is the DTO object that contains the details of the supplier.
+     * @return a string indicating that the supplier has been successfully saved.
+     */
     public String addNewSuppliers(SupplierDTO supplierDTO){
         Suppliers suppliers = new Suppliers();
         suppliers = SuppliersModelMapper.transferDtoToEntity(supplierDTO);
@@ -29,6 +35,12 @@ public class SupplierServiceImpl implements SupplierService {
         return "saved";
     }
 
+    /**
+     * This method is used to update the details of an existing supplier in the database.
+     *
+     * @param supplierDTO is the DTO object that contains the updated details of the supplier.
+     * @return a string indicating that the supplier details have been successfully updated.
+     */
     public String updateSupplierInfo(SupplierDTO supplierDTO){
         Suppliers suppliers = suppliersUtils.isSupplierExist(supplierDTO.getSuppliersId());
 
@@ -37,6 +49,13 @@ public class SupplierServiceImpl implements SupplierService {
         return "Supplier details has been updated";
     }
 
+    /**
+     * This method updates the details of a supplier with the details from the {@link SupplierDTO}.
+     *
+     * @param suppliers the {@link Suppliers} object that will be updated.
+     * @param supplierDTO the {@link SupplierDTO} object containing the new details.
+     * @return the updated {@link Suppliers} object.
+     */
     public Suppliers updateDetails(Suppliers suppliers,SupplierDTO supplierDTO){
         suppliers.setSupplierName(supplierDTO.getSupplierName());
         suppliers.setSupplierContactNumber(supplierDTO.getSupplierContactNumber());
@@ -49,6 +68,15 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
 
+    /**
+     * This method is used to deactivate or inactivate a supplier by setting the isActive field to either "Y" or "N".
+     *
+     * @param supplierId the ID of the supplier to be deactivated or inactivated.
+     * @param activeStatus a string that is converted to uppercase and used to set the isActive field.
+     *                     Only "Y" or "N" are accepted values.
+     * @return a string indicating that the supplier has been successfully deactivated or inactivated.
+     * @throws IllegalArgumentException if the activeStatus is not "Y" or "N".
+     */
     public String inActiveOrDeactivate(int supplierId, String activeStatus) {
         Suppliers suppliers = suppliersUtils.isSupplierExist(supplierId);
 
@@ -57,6 +85,13 @@ public class SupplierServiceImpl implements SupplierService {
         return "Suppliers deactivated.";
     }
 
+    /**
+     * This method is used to delete a supplier by its ID.
+     *
+     * @param supplierId the ID of the supplier to be deleted.
+     * @return a string indicating that the supplier info has been removed.
+     * @throws //SuppliersOprExceptionHandler if the supplier with the given ID does not exist.
+     */
     public String deleteSupplier(int supplierId) {
         Suppliers suppliers = suppliersUtils.isSupplierExist(supplierId);
         suppliersRepository.deleteById(supplierId);

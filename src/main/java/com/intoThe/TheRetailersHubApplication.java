@@ -6,6 +6,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TheRetailersHubApplication {
 
+
+	/**
+	 * This is the main method of the Spring Boot application.
+	 * It launches the application by calling the {@link SpringApplication#run(Class, String[])} method.
+	 *
+	 * @param args the command line arguments
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(TheRetailersHubApplication.class, args);
 	}

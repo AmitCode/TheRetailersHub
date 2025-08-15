@@ -29,26 +29,64 @@ public class AddressController {
      *         HttpStatus.NOT_FOUND
      */
 
+    /**
+     * This method is used to get the list of addresses associated with a user
+     *
+     * @param addressUserId The userId of the user whose addresses are to be fetched
+     * @return A ResponseEntity containing a list of {@link AddressDTO} objects,
+     *         with a status code of HttpStatus.FOUND if the addresses are found, else
+     *         HttpStatus.NOT_FOUND
+     */
     @GetMapping("/getAddressByUserId")
     public ResponseEntity<ArrayList<AddressDTO>> getAddressByUserId(@RequestHeader Long addressUserId){
         return new ResponseEntity<>(addressService.getAddressByUserId(addressUserId),HttpStatus.FOUND);
     }
 
+    /**
+     * This method is used to add a new address to the database.
+     *
+     * @param addressToBeAdded The {@link AddressDTO} object containing the details of the address to be added.
+     * @return A ResponseEntity containing a string indicating that the address has been created successfully.
+     *         The status code of the ResponseEntity is HttpStatus.CREATED.
+     */
     @PostMapping("/addNewAddress")
     public ResponseEntity<String> addNewAddress(@RequestBody AddressDTO addressToBeAdded){
         return new ResponseEntity<>(addressService.addNewAddress(addressToBeAdded),HttpStatus.CREATED);
     }
 
+    /**
+     * This method is used to update an existing address in the database.
+     *
+     * @param addressToBeUpdated The {@link AddressDTO} object containing the updated details of the address.
+     * @return A ResponseEntity containing an {@link AddressDTO} object,
+     *         with a status code of HttpStatus.ACCEPTED if the address is updated successfully, else
+     *         HttpStatus.INTERNAL_SERVER_ERROR.
+     */
     @PutMapping("/updateExistingAddress")
     public ResponseEntity<AddressDTO> updateExistingAddress(@RequestBody AddressDTO addressToBeUpdated){
         return new ResponseEntity<>(addressService.updateExistingAddress(addressToBeUpdated),HttpStatus.ACCEPTED);
     }
 
+    /**
+     * This method is used to mark an address as the primary address for a user.
+     *
+     * @param addressIdToMarkedAsPrimary The ID of the address to be marked as primary.
+     * @return A ResponseEntity containing a list of {@link AddressDTO} objects,
+     *         with a status code of HttpStatus.ACCEPTED if the address is marked as primary successfully, else
+     *         HttpStatus.INTERNAL_SERVER_ERROR.
+     */
     @PatchMapping("/makeAddressAsPrimary")
     public ResponseEntity<ArrayList<AddressDTO>> markAddressAsPrimary(@RequestHeader Long addressIdToMarkedAsPrimary){
         return new ResponseEntity<>(addressService.makeAddressAsPrimary(addressIdToMarkedAsPrimary),HttpStatus.ACCEPTED);
     }
 
+    /**
+     * This method is used to delete an existing address from the database.
+     *
+     * @param addressIdToBeDeleted The ID of the address to be deleted.
+     * @return A ResponseEntity containing a string indicating that the address has been deleted successfully,
+     *         with a status code of HttpStatus.OK.
+     */
     @DeleteMapping("/deleteExistingAddress")
     public ResponseEntity<String> deleteExistingAddress(@RequestHeader Long addressIdToBeDeleted){
         return new ResponseEntity<>(addressService.deleteExistingAddress(addressIdToBeDeleted),HttpStatus.OK);
