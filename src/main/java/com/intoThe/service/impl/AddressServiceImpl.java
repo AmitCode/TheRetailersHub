@@ -37,6 +37,12 @@ public class AddressServiceImpl implements AddressService {
         return "Address has been created!...";
     }
 
+    /**
+     * This method is used to update an existing address in the database.
+     *
+     * @param addressDTO The {@link AddressDTO} object containing the updated details of the address.
+     * @return An {@link AddressDTO} object representing the updated address.
+     */
     @Override
     public AddressDTO updateExistingAddress(AddressDTO addressDTO) {
 
