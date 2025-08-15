@@ -1,0 +1,84 @@
+package com.intoThe.controller;
+
+import com.intoThe.dto.AddressDTO;
+import com.intoThe.service.AddressService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("/AddressService")
+public class AddressController {
+
+    @Autowired
+    private final AddressService addressService;
+
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
+
+    /**
+     * This method is used to get the list of addresses associated with a user
+     *
+     * @param addressUserId The userId of the user whose addresses are to be fetched
+     * @return A ResponseEntity containing a list of {@link AddressDTO} objects,
+     *         with a status code of HttpStatus.FOUND if the addresses are found, else
+     *         HttpStatus.NOT_FOUND
+     */
+
+    @GetMapping("/getAddressByUserId")
+    public ResponseEntity<ArrayList<AddressDTO>> getAddressByUserId(@RequestHeader Long addressUserId){
+        return new ResponseEntity<>(addressService.getAddressByUserId(addressUserId),HttpStatus.FOUND);
+    }
+
+    @PostMapping("/addNewAddress")
+    public ResponseEntity<String> addNewAddress(@RequestBody AddressDTO addressToBeAdded){
+        return new ResponseEntity<>(addressService.addNewAddress(addressToBeAdded),HttpStatus.CREATED);
+    }
+
+    @PutMapping("/updateExistingAddress")
+    public ResponseEntity<AddressDTO> updateExistingAddress(@RequestBody AddressDTO addressToBeUpdated){
+        return new ResponseEntity<>(addressService.updateExistingAddress(addressToBeUpdated),HttpStatus.ACCEPTED);
+    }
+
+    @PatchMapping("/makeAddressAsPrimary")
+    public ResponseEntity<ArrayList<AddressDTO>> markAddressAsPrimary(@RequestHeader Long addressIdToMarkedAsPrimary){
+        return new ResponseEntity<>(addressService.makeAddressAsPrimary(addressIdToMarkedAsPrimary),HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/deleteExistingAddress")
+    public ResponseEntity<String> deleteExistingAddress(@RequestHeader Long addressIdToBeDeleted){
+        return new ResponseEntity<>(addressService.deleteExistingAddress(addressIdToBeDeleted),HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to change the active status of an address
+     *
+     * @param addressId The ID of the address whose active status is to be changed
+     * @param isActive The new active status of the address. Must be either "Y" or "N"
+     * @return A ResponseEntity containing the updated {@link AddressDTO} object,
+     *         with a status code of HttpStatus.OK if the active status is successfully changed,
+     *         else HttpStatus.BAD_REQUEST
+     */
+    @PatchMapping("/changeActiveStatusOfAddress")
+    public ResponseEntity<AddressDTO> changeActiveStatusOfAddress(@RequestHeader Long addressId, @RequestHeader String isActive){
+        return new ResponseEntity<>(addressService.
+                modifyActiveStatusOfAddress(addressId,isActive),HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get the details of an address by its ID
+     *
+     * @param addressId The ID of the address to be fetched
+     * @return A ResponseEntity containing an {@link AddressDTO} object,
+     *         with a status code of HttpStatus.FOUND if the address is found, else
+     *         HttpStatus.NOT_FOUND
+     */
+    @GetMapping("/getAddressDetailsById")
+    public ResponseEntity<AddressDTO> getAddressDetailsById(@RequestHeader Long addressId){
+        return new ResponseEntity<>(addressService.getAddressById(addressId),HttpStatus.FOUND);
+    }
+}
