@@ -1,11 +1,14 @@
 package com.intoThe.controller;
 
 import com.intoThe.dto.AddressDTO;
+import com.intoThe.errorResponse.RetailerExceptionResponse;
+import com.intoThe.exceptions.SuppliersOprException.ResourceNotFound;
 import com.intoThe.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 
@@ -118,5 +121,13 @@ public class AddressController {
     @GetMapping("/getAddressDetailsById")
     public ResponseEntity<AddressDTO> getAddressDetailsById(@RequestHeader Long addressId){
         return new ResponseEntity<>(addressService.getAddressById(addressId),HttpStatus.FOUND);
+    }
+
+    @ExceptionHandler(ResourceNotFound.class)
+    public ResponseEntity<RetailerExceptionResponse> addressNotFound(ResourceNotFound resourceNotFound,
+                                                                     WebRequest request){
+        return new ResponseEntity<>(new RetailerExceptionResponse(HttpStatus.NOT_FOUND.value(),
+                resourceNotFound.getMessage(),
+                request.getDescription(false)),HttpStatus.NOT_FOUND);
     }
 }

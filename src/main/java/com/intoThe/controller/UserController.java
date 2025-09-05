@@ -1,11 +1,15 @@
 package com.intoThe.controller;
 
 import com.intoThe.dto.UserDTO;
+import com.intoThe.errorResponse.RetailerExceptionResponse;
+import com.intoThe.exceptions.SuppliersOprException.ResourceNotFound;
+import com.intoThe.exceptions.SuppliersOprException.SuppliersOprExceptionHandler;
 import com.intoThe.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
@@ -78,5 +82,29 @@ public class UserController {
                                                    @RequestHeader String isActive){
         return new ResponseEntity<>(userService.
                 activateOrDeactivate(userId,isActive),HttpStatus.ACCEPTED);
+    }
+
+
+    /**
+     * This method is used to handle {@link ResourceNotFound} exceptions thrown during the execution of any of the
+     * {@link UserController} methods.
+     *
+     * @param resourceNotFound The {@link ResourceNotFound} exception to be handled.
+     * @param request The {@link WebRequest} object containing information about the request that caused the exception.
+     *
+     * @return A {@link ResponseEntity} containing a {@link RetailerExceptionResponse} object with the HTTP status code
+     *         set to {@link HttpStatus#NOT_FOUND}. The body of the ResponseEntity will contain the exception message
+     *         and the description of the request that caused the exception.
+     */
+
+
+    @ExceptionHandler(ResourceNotFound.class)
+    public ResponseEntity<RetailerExceptionResponse> supplierNotFound(ResourceNotFound resourceNotFound,
+                                                                        WebRequest request){
+        return new ResponseEntity<>(new RetailerExceptionResponse(HttpStatus.NOT_FOUND.value(),
+                resourceNotFound.getMessage(),request.getDescription(false)),
+                HttpStatus.NOT_FOUND);
+
+
     }
 }
