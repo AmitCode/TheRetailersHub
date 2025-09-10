@@ -2,6 +2,7 @@ package com.intoThe.controller;
 
 import com.intoThe.dto.UserDTO;
 import com.intoThe.errorResponse.RetailerExceptionResponse;
+import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
 import com.intoThe.exceptions.SuppliersOprException.ResourceNotFound;
 import com.intoThe.exceptions.SuppliersOprException.SuppliersOprExceptionHandler;
 import com.intoThe.service.impl.UserServiceImpl;
@@ -106,5 +107,13 @@ public class UserController {
                 HttpStatus.NOT_FOUND);
 
 
+    }
+
+    @ExceptionHandler(EmailIdAlreadyExist.class)
+    public ResponseEntity<RetailerExceptionResponse> emailIdAlreadyExist(EmailIdAlreadyExist emailIdAlreadyExist,
+                                                                         WebRequest webRequest){
+        return new ResponseEntity<>(new RetailerExceptionResponse(HttpStatus.BAD_REQUEST.value(),
+                emailIdAlreadyExist.getMessage(),webRequest.getDescription(false)),
+                HttpStatus.BAD_REQUEST);
     }
 }

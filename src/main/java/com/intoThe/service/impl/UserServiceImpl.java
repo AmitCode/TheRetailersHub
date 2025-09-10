@@ -2,6 +2,7 @@ package com.intoThe.service.impl;
 
 import com.intoThe.dto.UserDTO;
 import com.intoThe.entities.Users;
+import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,12 +32,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String addUser(UserDTO userDTO) {
-        try{
-            Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
-        }catch (Exception ex){
-            System.out.println("{UserServiceImpl} - [addUser] - Ex-" +ex.getMessage());
-        }
-        return "Data has been saved successfully";
+        String message = "";
+            if(UserUtils.isUserExistWithEmail(userDTO.getUserEmailId(),userRepository)){
+                throw new EmailIdAlreadyExist("User with this email id already exist!...");
+            }else{
+                Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
+                message = "Data has been saved successfully";
+            }
+
+        return message;
     }
     /**
      * This method is used to update an existing user in the database.
