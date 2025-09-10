@@ -2,6 +2,7 @@ package com.intoThe.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,7 @@ public class UserDTO {
     private String userLastName;
 
     @NotBlank(message = "User Contact Number is required")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Contact number must be 10 digits")
     private String userContactNumber;
 
     @NotBlank(message = "User Email is required")
