@@ -35,7 +35,7 @@ public class RetailerGlobalLevelException{
                 webRequest.getDescription(false)),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
+
     /**
      * This method is responsible for catching all {@link HttpMessageNotReadableException}
      * and returning a ResponseEntity containing a RetailerExceptionResponse object with the
@@ -46,7 +46,7 @@ public class RetailerGlobalLevelException{
      * @return A ResponseEntity object containing the RetailerExceptionResponse
      *         object and the HTTP status code NO_CONTENT.
      */
-/* <<<<<<<<<<  387dbbe1-7a17-48df-8193-d06728791ddf  >>>>>>>>>>> */
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<RetailerExceptionResponse> handleRequestCannotBeEmpty(HttpMessageNotReadableException
                                                                                 messageException,
