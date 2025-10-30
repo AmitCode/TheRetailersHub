@@ -62,7 +62,7 @@ public class AddressController {
      *
      * @param addressToBeUpdated The {@link AddressDTO} object containing the updated details of the address.
      * @return A ResponseEntity containing an {@link AddressDTO} object,
-     *         with a status code of HttpStatus.ACCEPTED if the address is updated successfully, else
+     *         with a status code of HttpStatus. ACCEPTED if the address is updated successfully, else
      *         HttpStatus.INTERNAL_SERVER_ERROR.
      */
     @PutMapping("/updateExistingAddress")
@@ -75,7 +75,7 @@ public class AddressController {
      *
      * @param addressIdToMarkedAsPrimary The ID of the address to be marked as primary.
      * @return A ResponseEntity containing a list of {@link AddressDTO} objects,
-     *         with a status code of HttpStatus.ACCEPTED if the address is marked as primary successfully, else
+     *         with a status code of HttpStatus. ACCEPTED if the address is marked as primary successfully, else
      *         HttpStatus.INTERNAL_SERVER_ERROR.
      */
     @PatchMapping("/makeAddressAsPrimary")
@@ -115,7 +115,7 @@ public class AddressController {
      *
      * @param addressId The ID of the address to be fetched
      * @return A ResponseEntity containing an {@link AddressDTO} object,
-     *         with a status code of HttpStatus.FOUND if the address is found, else
+     *         with a status code of HttpStatus. FOUND if the address is found, else
      *         HttpStatus.NOT_FOUND
      */
     @GetMapping("/getAddressDetailsById")

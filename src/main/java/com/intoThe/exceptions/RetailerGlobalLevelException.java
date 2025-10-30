@@ -17,7 +17,8 @@ import org.springframework.web.context.request.WebRequest;
 
 @RestControllerAdvice
 public class RetailerGlobalLevelException{
-//public class RetailerGlobalLevelException extends Exception{do not extend Exception in case of global exception handler.
+//public class RetailerGlobalLevelException extends Exception{
+// do not extend Exception in case of global exception handler.
 
     /**
      * This method is responsible for catching all unchecked exceptions and returning
