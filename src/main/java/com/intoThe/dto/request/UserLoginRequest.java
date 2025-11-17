@@ -1,7 +1,9 @@
 package com.intoThe.dto.request;
 
+import com.intoThe.validation.annoation.AtLeastOneRequired;
 import jakarta.validation.constraints.NotBlank;
 
+@AtLeastOneRequired
 public class UserLoginRequest {
     private String userEmail;
 
