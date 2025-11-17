@@ -2,6 +2,7 @@ package com.intoThe.controller;
 
 import com.intoThe.dto.SupplierDTO;
 import com.intoThe.service.SupplierService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/SupplierService") // 👈 This sets the base URL path
 public class SupplierController {
 
-    //@Autowired
+    @Autowired
     private final SupplierService supplierService;
 
     public SupplierController(SupplierService supplierService) {

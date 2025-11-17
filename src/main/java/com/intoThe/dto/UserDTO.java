@@ -33,6 +33,10 @@ public class UserDTO {
     private String isUserActive;
     private String isMobileVarified;
     private String isEmailVarified;
+    @NotBlank(message = "User Password can't be empty!...")
+    private String userPassword;
+    @NotBlank(message = "Re-confirm your password!...")
+    private String isPasswordVarified;
 
     public Long getUserId() {
         return userId;
@@ -104,5 +108,21 @@ public class UserDTO {
 
     public void setIsEmailVarified(String isEmailVarified) {
         this.isEmailVarified = isEmailVarified;
+    }
+
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
+
+    public String getIsPasswordVarified() {
+        return isPasswordVarified;
+    }
+
+    public void setIsPasswordVarified(String isPasswordVarified) {
+        this.isPasswordVarified = isPasswordVarified;
     }
 }

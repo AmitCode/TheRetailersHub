@@ -13,12 +13,11 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/AddressService")
+@RequestMapping("/AddressService")/**/
 public class AddressController {
 
     @Autowired
     private final AddressService addressService;
-
     public AddressController(AddressService addressService) {
         this.addressService = addressService;
     }
@@ -42,7 +41,8 @@ public class AddressController {
      */
     @GetMapping("/getAddressByUserId")
     public ResponseEntity<ArrayList<AddressDTO>> getAddressByUserId(@RequestHeader Long addressUserId){
-        return new ResponseEntity<>(addressService.getAddressByUserId(addressUserId),HttpStatus.FOUND);
+        return new ResponseEntity<>(addressService.getAddressByUserId(addressUserId),
+                HttpStatus.FOUND);
     }
 
     /**
@@ -54,7 +54,8 @@ public class AddressController {
      */
     @PostMapping("/addNewAddress")
     public ResponseEntity<String> addNewAddress(@RequestBody AddressDTO addressToBeAdded){
-        return new ResponseEntity<>(addressService.addNewAddress(addressToBeAdded),HttpStatus.CREATED);
+        return new ResponseEntity<>(addressService.addNewAddress(addressToBeAdded),
+                HttpStatus.CREATED);
     }
 
     /**

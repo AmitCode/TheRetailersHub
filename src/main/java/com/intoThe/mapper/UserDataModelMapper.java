@@ -24,7 +24,8 @@ public class UserDataModelMapper {
         users.setUserEmailId(userDTO.getUserEmailId());
         users.setIsEmailVarified(userDTO.getIsEmailVarified());
         users.setIsMobileVarified(userDTO.getIsMobileVarified());
-
+        users.setPassword(userDTO.getUserPassword());
+        users.setConfirmPassword(userDTO.getIsPasswordVarified());
         return users;
     }
 
@@ -46,7 +47,8 @@ public class UserDataModelMapper {
         userDTO.setUserContactNumber(users.getUserContactNumber());
         userDTO.setIsMobileVarified(users.getIsMobileVarified());
         userDTO.setIsEmailVarified(users.getIsEmailVarified());
-
+        userDTO.setUserPassword(users.getPassword());
+        userDTO.setIsPasswordVarified(users.getConfirmPassword());
         return userDTO;
     }
 

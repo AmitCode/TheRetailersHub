@@ -8,20 +8,22 @@ import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
 import com.intoThe.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
+    private PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
 
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -33,6 +35,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(UserDTO userDTO) {
         String message = "";
+        userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
+        userDTO.setIsPasswordVarified(passwordEncoder.encode(userDTO.getIsPasswordVarified()));
+
             if(UserUtils.isUserExistWithEmail(userDTO.getUserEmailId(),userRepository)){
                 throw new EmailIdAlreadyExist("User with this email id already exist!...");
             }else{

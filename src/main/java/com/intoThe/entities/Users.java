@@ -3,7 +3,6 @@ package com.intoThe.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -27,6 +26,10 @@ public class Users {
     private String isUserActive;
     private String isMobileVarified;
     private String isEmailVarified;
+    private String password;
+    private String confirmPassword;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
     @CreationTimestamp
     private LocalDateTime creationDate;
     @UpdateTimestamp
@@ -109,6 +112,30 @@ public class Users {
 
     public void setIsEmailVarified(String isEmailVarified) {
         this.isEmailVarified = isEmailVarified;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public LocalDateTime getCreationDate() {
