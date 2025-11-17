@@ -96,7 +96,7 @@ public class AddressServiceImpl implements AddressService {
      */
     @Override
     public ArrayList<AddressDTO> getAddressByUserId(Long userId) {
-        List<Address> addressList = addressRepository.findByAddressUserId(userId);
+        List<Address> addressList = new ArrayList<>();
         return addressModelMapper.mapToAddressDTOList(addressList);
     }
 
@@ -125,7 +125,7 @@ public class AddressServiceImpl implements AddressService {
         Address address = AddressUtils.isAddressExist(addressId,addressRepository);
         address.setIsPrimaryAddress("Y");
         address = addressRepository.save(address);
-        List<Address> addressList = addressRepository.findByAddressUserId(address.getAddressUserId());
+        List<Address> addressList = new ArrayList<>();
         for (Address address1: addressList){
             if(!Objects.equals(address1.getAddressId(), address.getAddressId())){
                 address1.setIsPrimaryAddress("N");

@@ -16,7 +16,6 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressId;
-    private Long addressUserId;
     private String addressType;
     private String home;
     private String pinCode;
@@ -28,6 +27,10 @@ public class Address {
     private String isAddressActive;
     private LocalDateTime creationDate;
     private LocalDateTime lastUpdatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private Users userInfo;
 
     public Address() {
         this("Y");
@@ -43,14 +46,6 @@ public class Address {
 
     public void setAddressId(Long addressId) {
         this.addressId = addressId;
-    }
-
-    public Long getAddressUserId() {
-        return addressUserId;
-    }
-
-    public void setAddressUserId(Long addressUserId) {
-        this.addressUserId = addressUserId;
     }
 
     public String getAddressType() {
@@ -139,5 +134,13 @@ public class Address {
 
     public void setLastUpdatedAt(LocalDateTime lastUpdatedAt) {
         this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    public Users getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(Users userInfo) {
+        this.userInfo = userInfo;
     }
 }

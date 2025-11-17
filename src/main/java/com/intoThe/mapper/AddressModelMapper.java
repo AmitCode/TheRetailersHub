@@ -15,10 +15,9 @@ public class AddressModelMapper {
      * @param address The Address object to be mapped.
      * @return The mapped AddressDTO object.
      */
-    public AddressDTO mapToAddressDTO(Address address){
+    public static AddressDTO mapToAddressDTO(Address address){
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setAddressId(address.getAddressId());
-        addressDTO.setAddressUserId(address.getAddressUserId());
         addressDTO.setAddressType(address.getAddressType());
         addressDTO.setHome(address.getHome());
         addressDTO.setArea(address.getArea());
@@ -37,10 +36,9 @@ public class AddressModelMapper {
      * @param addressDTO The AddressDTO object to be mapped.
      * @return The mapped Address object.
      */
-    public Address mapToAddress(AddressDTO addressDTO){
+    public static Address mapToAddress(AddressDTO addressDTO){
         Address address = new Address();
         address.setAddressId(addressDTO.getAddressId());
-        address.setAddressUserId(addressDTO.getAddressUserId());
         address.setAddressType(addressDTO.getAddressType());
         address.setHome(addressDTO.getHome());
         address.setArea(addressDTO.getArea());

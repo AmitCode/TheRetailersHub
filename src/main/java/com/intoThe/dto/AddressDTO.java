@@ -1,5 +1,6 @@
 package com.intoThe.dto;
 
+import com.intoThe.entities.Users;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,8 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AddressDTO {
     private Long addressId;
-    @NotBlank(message = "Address user id can't be null.")
-    private Long addressUserId;
     @NotBlank(message = "Address type can't be null.")
     private String addressType;
     @NotBlank(message = "Home can't be null.")
@@ -29,6 +28,7 @@ public class AddressDTO {
     @NotBlank(message = "Please select primary address.")
     private String isPrimaryAddress;
     private String isAddressActive;
+    private Users userInfo;
 
     public AddressDTO() {
         this("Y");
@@ -44,14 +44,6 @@ public class AddressDTO {
 
     public void setAddressId(Long addressId) {
         this.addressId = addressId;
-    }
-
-    public Long getAddressUserId() {
-        return addressUserId;
-    }
-
-    public void setAddressUserId(Long addressUserId) {
-        this.addressUserId = addressUserId;
     }
 
     public String getAddressType() {
@@ -124,5 +116,13 @@ public class AddressDTO {
 
     public void setIsAddressActive(String isAddressActive) {
         this.isAddressActive = isAddressActive;
+    }
+
+    public Users getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(Users userInfo) {
+        this.userInfo = userInfo;
     }
 }

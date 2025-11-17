@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "INTO_USER_DATA")
@@ -34,6 +35,9 @@ public class Users {
     private LocalDateTime creationDate;
     @UpdateTimestamp
     private LocalDateTime lastUpdated;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userInfo",fetch = FetchType.EAGER)
+    private List<Address> addresses;
+
 
     public Users() {
         this("Y");
@@ -152,5 +156,13 @@ public class Users {
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
     }
 }
