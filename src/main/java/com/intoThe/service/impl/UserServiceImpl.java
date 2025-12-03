@@ -15,12 +15,12 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
+
     private PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
 
-
+    //@Autowired ----> // @Autowired needed — ONLY ONE constructor
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

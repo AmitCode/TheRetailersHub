@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-
-    @Autowired
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+
+    //@Autowired ----> No @Autowired needed — ONLY ONE constructor
     public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

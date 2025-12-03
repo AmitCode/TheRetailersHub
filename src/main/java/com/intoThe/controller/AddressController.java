@@ -16,7 +16,7 @@ import java.util.ArrayList;
 @RequestMapping("/AddressService")/**/
 public class AddressController {
 
-    @Autowired
+    //@Autowired No @Autowired needed — ONLY ONE constructor
     private final AddressService addressService;
     public AddressController(AddressService addressService) {
         this.addressService = addressService;

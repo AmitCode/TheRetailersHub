@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/SupplierService") // 👈 This sets the base URL path
 public class SupplierController {
 
-    @Autowired
+    //@Autowired
     private final SupplierService supplierService;
 
     public SupplierController(SupplierService supplierService) {

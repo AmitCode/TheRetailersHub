@@ -16,7 +16,7 @@ public class SupplierServiceImpl implements SupplierService {
     private final SuppliersRepository suppliersRepository;
     private final SuppliersUtils suppliersUtils;
 
-    @Autowired
+    //@Autowired ---> No @Autowired needed — ONLY ONE constructor
     public SupplierServiceImpl(SuppliersRepository suppliersRepository,SuppliersUtils suppliersUtils) {
         this.suppliersRepository = suppliersRepository;
         this.suppliersUtils = suppliersUtils;

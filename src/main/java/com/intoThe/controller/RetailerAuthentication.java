@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class RetailerAuthentication {
 
-    @Autowired
+    //@Autowired
     private final AuthService authService;
     public RetailerAuthentication(AuthService authService) {
         this.authService = authService;
