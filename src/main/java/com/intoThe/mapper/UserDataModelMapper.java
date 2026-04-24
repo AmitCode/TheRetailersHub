@@ -1,8 +1,8 @@
 package com.intoThe.mapper;
 
-import com.intoThe.dto.AddressDTO;
+//import com.intoThe.dto.AddressDTO;
 import com.intoThe.dto.UserDTO;
-import com.intoThe.entities.Address;
+//import com.intoThe.entities.Address;
 import com.intoThe.entities.Users;
 
 import java.util.ArrayList;
@@ -30,13 +30,13 @@ public class UserDataModelMapper {
         users.setPassword(userDTO.getUserPassword());
         users.setConfirmPassword(userDTO.getIsPasswordVarified());
 
-        List<Address> addresses = userDTO.getAddresses().stream()
-                //.map(addressDTO -> AddressModelMapper.mapToAddress(addressDTO))writing it to method reference
-                .map(AddressModelMapper::mapToAddress)//Method reference
-                .collect(Collectors.toList());
-
-        addresses.forEach(address -> address.setUserInfo(users));
-        users.setAddresses(addresses);
+//        List<Address> addresses = userDTO.getAddresses().stream()
+//                //.map(addressDTO -> AddressModelMapper.mapToAddress(addressDTO))writing it to method reference
+//                .map(AddressModelMapper::mapToAddress)//Method reference
+//                .collect(Collectors.toList());
+//
+//        addresses.forEach(address -> address.setUserInfo(users));
+//        users.setAddresses(addresses);
 
         return users;
     }
@@ -62,13 +62,13 @@ public class UserDataModelMapper {
         userDTO.setUserPassword(users.getPassword());
         userDTO.setIsPasswordVarified(users.getConfirmPassword());
 
-        List<AddressDTO> addresses = users.getAddresses().stream()
-                .map(AddressModelMapper::mapToAddressDTO)
-                .collect(Collectors.toList());
-
-        //addresses.forEach(address -> address.setUserInfo(users));
-
-        userDTO.setAddresses(addresses);
+//        List<AddressDTO> addresses = users.getAddresses().stream()
+//                .map(AddressModelMapper::mapToAddressDTO)
+//                .collect(Collectors.toList());
+//
+//        //addresses.forEach(address -> address.setUserInfo(users));
+//
+//        userDTO.setAddresses(addresses);
 
         return userDTO;
     }

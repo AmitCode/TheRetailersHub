@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
-
+//Create and separate supplier microservice for suppliers management.
 @Entity
 @Table(name = "INTO_SUPPLIERS_DATA")
 @Getter
