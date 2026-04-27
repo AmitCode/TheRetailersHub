@@ -124,7 +124,7 @@ public class RetailerGlobalLevelException{
     public ResponseEntity<RetailerExceptionResponse> handleMethodArgumentValidationException(
             MethodArgumentNotValidException exception, WebRequest webRequest){
         return new ResponseEntity<>(new RetailerExceptionResponse(
-                HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
                 webRequest.getDescription(false)),HttpStatus.BAD_REQUEST);
     }
