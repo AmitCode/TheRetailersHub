@@ -16,12 +16,12 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
 
     //@Autowired ----> // @Autowired needed — ONLY ONE constructor
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -37,13 +37,11 @@ public class UserServiceImpl implements UserService {
         String message = "";
         userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
 
-            if(UserUtils.isUserExistWithEmail(userDTO.getUserName(),userRepository)){
-                throw new EmailIdAlreadyExist("User with this email id already exist!...");
-            }else if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
+            if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
                 throw  new UserNameAlreadyExist("User with this user name already exist!...");
             }else{
                 Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
-                message = "Data has been saved successfully";
+                message = "New User Added Successfully!...";
             }
 
         return message;

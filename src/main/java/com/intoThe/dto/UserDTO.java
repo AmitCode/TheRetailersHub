@@ -17,9 +17,8 @@ import java.util.List;
 @Setter
 public class UserDTO {
     private Long userId;
-    @NotBlank(message = "User First Name is required")
+    @NotBlank(message = "User Name can't be empty!...")
     private String userName;
-    @NotBlank(message = "User Email is required")
     private String isUserActive;
     @NotBlank(message = "User Password can't be empty!...")
     private String userPassword;

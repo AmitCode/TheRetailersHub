@@ -34,7 +34,7 @@ public class UserUtils {
      */
 
     public static Boolean isUserExistWithEmail(String userEmailId,UserRepository userRepository){
-        return userRepository.findByUserEmailId(userEmailId).isPresent();
+        return userRepository.findByUserName(userEmailId).isPresent();
     }
 
     public static Boolean isUserNameAlreadyExist(String userName, UserRepository userRepository){
