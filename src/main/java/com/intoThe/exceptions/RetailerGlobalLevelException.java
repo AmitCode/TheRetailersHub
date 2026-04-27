@@ -5,6 +5,7 @@ import com.intoThe.errorResponse.RetailerExceptionResponse;
 
 import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
 import com.intoThe.exceptions.SuppliersOprException.ResourceNotFound;
+import com.intoThe.exceptions.SuppliersOprException.UserNameAlreadyExist;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -107,7 +108,6 @@ public class RetailerGlobalLevelException{
                 HttpStatus.BAD_REQUEST);
     }
 
-
     /**
      * Handles {@link MethodArgumentNotValidException} exceptions thrown when the arguments passed to a controller
      * method do not pass validation.
@@ -127,5 +127,13 @@ public class RetailerGlobalLevelException{
                 HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
                 webRequest.getDescription(false)),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNameAlreadyExist.class)
+    public ResponseEntity<RetailerExceptionResponse> userNameAlreadyExist(UserNameAlreadyExist userNameAlreadyExist,
+                                                                   WebRequest webRequest){
+        return new ResponseEntity<>(new RetailerExceptionResponse(HttpStatus.BAD_REQUEST.value(),
+                userNameAlreadyExist.getMessage(), webRequest.getDescription(false)),
+                HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,8 +1,6 @@
 package com.intoThe.mapper;
 
-//import com.intoThe.dto.AddressDTO;
 import com.intoThe.dto.UserDTO;
-//import com.intoThe.entities.Address;
 import com.intoThe.entities.Users;
 
 import java.util.ArrayList;
@@ -20,15 +18,9 @@ public class UserDataModelMapper {
     public Users mapToUser(UserDTO userDTO){
 
         Users users = new Users();
-        users.setUserFirstName(userDTO.getUserFirstName());
-        users.setUserMiddleName(userDTO.getUserMiddleName());
-        users.setUserLastName(userDTO.getUserLastName());
-        users.setUserContactNumber(userDTO.getUserContactNumber());
-        users.setUserEmailId(userDTO.getUserEmailId());
-        users.setIsEmailVarified(userDTO.getIsEmailVarified());
-        users.setIsMobileVarified(userDTO.getIsMobileVarified());
+        users.setUserName(userDTO.getUserName());
         users.setPassword(userDTO.getUserPassword());
-        users.setConfirmPassword(userDTO.getIsPasswordVarified());
+        users.setIsUserActive(users.getIsUserActive());
 
 //        List<Address> addresses = userDTO.getAddresses().stream()
 //                //.map(addressDTO -> AddressModelMapper.mapToAddress(addressDTO))writing it to method reference
@@ -51,16 +43,9 @@ public class UserDataModelMapper {
 
         UserDTO userDTO = new UserDTO();
         userDTO.setUserId(users.getUserId());
-        userDTO.setUserFirstName(users.getUserFirstName());
-        userDTO.setUserMiddleName(users.getUserMiddleName());
-        userDTO.setUserLastName(users.getUserLastName());
+        userDTO.setUserName(users.getUserName());
         userDTO.setIsUserActive(users.getIsUserActive());
-        userDTO.setUserEmailId(users.getUserEmailId());
-        userDTO.setUserContactNumber(users.getUserContactNumber());
-        userDTO.setIsMobileVarified(users.getIsMobileVarified());
-        userDTO.setIsEmailVarified(users.getIsEmailVarified());
         userDTO.setUserPassword(users.getPassword());
-        userDTO.setIsPasswordVarified(users.getConfirmPassword());
 
 //        List<AddressDTO> addresses = users.getAddresses().stream()
 //                .map(AddressModelMapper::mapToAddressDTO)

@@ -3,11 +3,11 @@ package com.intoThe.service.impl;
 import com.intoThe.dto.UserDTO;
 import com.intoThe.entities.Users;
 import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
+import com.intoThe.exceptions.SuppliersOprException.UserNameAlreadyExist;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
 import com.intoThe.utils.UserUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +36,11 @@ public class UserServiceImpl implements UserService {
     public String addUser(UserDTO userDTO) {
         String message = "";
         userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
-        userDTO.setIsPasswordVarified(passwordEncoder.encode(userDTO.getIsPasswordVarified()));
 
-            if(UserUtils.isUserExistWithEmail(userDTO.getUserEmailId(),userRepository)){
+            if(UserUtils.isUserExistWithEmail(userDTO.getUserName(),userRepository)){
                 throw new EmailIdAlreadyExist("User with this email id already exist!...");
+            }else if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
+                throw  new UserNameAlreadyExist("User with this user name already exist!...");
             }else{
                 Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
                 message = "Data has been saved successfully";
@@ -58,16 +59,9 @@ public class UserServiceImpl implements UserService {
 
         Long userId = userDTO.getUserId();
         Users users = UserUtils.isUserExist(userId,userRepository);
-
-        users.setUserFirstName(userDTO.getUserFirstName());
-        users.setUserMiddleName(userDTO.getUserMiddleName());
-        users.setUserLastName(userDTO.getUserLastName());
-        users.setUserContactNumber(userDTO.getUserContactNumber());
-        users.setUserEmailId(userDTO.getUserEmailId());
+        users.setUserName(userDTO.getUserName());
         users.setIsUserActive(userDTO.getIsUserActive());
-        users.setIsEmailVarified(userDTO.getIsEmailVarified());
-        users.setIsMobileVarified(userDTO.getIsMobileVarified());
-
+        users.setPassword(userDTO.getUserPassword());
         users = userRepository.save(users);
 
         return userModelMapper.mapToUserDTO(users);
