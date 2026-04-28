@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/UserService")
+@RequestMapping("/userService")
 public class UserController {
     //@Autowired
     private final UserServiceImpl userService;
@@ -26,7 +26,7 @@ public class UserController {
      * @return A string indicating that the user was successfully created.
      */
     @PostMapping("/createNewUser")
-    public String createNewUser(@Valid  @RequestBody UserDTO userDTO){
+    public ResponseEntity<?> createNewUser(@Valid  @RequestBody UserDTO userDTO){
         return userService.addUser(userDTO);
     }
 

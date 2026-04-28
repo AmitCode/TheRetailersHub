@@ -1,15 +1,22 @@
 package com.intoThe.service.impl;
 
 import com.intoThe.dto.UserDTO;
+import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.entities.Users;
-import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
 import com.intoThe.exceptions.SuppliersOprException.UserNameAlreadyExist;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
 import com.intoThe.utils.UserUtils;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 
@@ -18,12 +25,18 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final WebClient webClient;
+    //private final RestTemplate restTemplate;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
+    AuthenticationServiceResponse response;
 
     //@Autowired ----> // @Autowired needed — ONLY ONE constructor
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                           WebClient webClient) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.webClient = webClient;
+        //this.restTemplate = restTemplate;
     }
 
     /**
@@ -33,18 +46,38 @@ public class UserServiceImpl implements UserService {
      * @return A string indicating that the data has been saved successfully.
      */
     @Override
-    public String addUser(UserDTO userDTO) {
-        String message = "";
+    @Transactional
+    public ResponseEntity<?> addUser(UserDTO userDTO) {
+
         userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
 
             if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
+                System.out.println("User Name: " + userDTO.getUserName());
                 throw  new UserNameAlreadyExist("User with this user name already exist!...");
             }else{
+
                 Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
-                message = "New User Added Successfully!...";
+                //AuthenticationServiceResponse response1 = restTemplate.post
+                try{
+                    response = webClient.post()
+                            .uri("/usersOpr/v1/addNewUser")
+                            .bodyValue(userDTO)
+                            .retrieve()
+                            .bodyToMono(AuthenticationServiceResponse.class)
+                            .block();
+
+                    response.setResponseMsg("User created successfully!...")
+                            .setIsOprSuccess(true)
+                            .setStatusCode(HttpStatus.CREATED.toString());
+                }catch (WebClientResponseException webClientResponseException){
+                    return ResponseEntity
+                            .status(webClientResponseException.getStatusCode())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(webClientResponseException.getResponseBodyAsString());
+                }
             }
 
-        return message;
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     /**
      * This method is used to update an existing user in the database.

@@ -1,11 +1,12 @@
 package com.intoThe.service;
 
 import com.intoThe.dto.UserDTO;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface UserService {
-    public String addUser(UserDTO userDTO);
+    public ResponseEntity<?> addUser(UserDTO userDTO);
     public UserDTO updateUser(UserDTO userDTO);
     public String deleteUser(Long userId);
     public String activateOrDeactivate(Long userId, String isActive);
