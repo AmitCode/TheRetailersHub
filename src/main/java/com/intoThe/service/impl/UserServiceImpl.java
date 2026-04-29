@@ -9,6 +9,7 @@ import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
 import com.intoThe.utils.UserUtils;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,31 +51,77 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> addUser(UserDTO userDTO) {
 
         userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
+            synchronized (this){
 
-            if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
-                System.out.println("User Name: " + userDTO.getUserName());
-                throw  new UserNameAlreadyExist("User with this user name already exist!...");
-            }else{
+            }
 
+//            if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
+//                System.out.println("User Name: " + userDTO.getUserName());
+//                throw  new UserNameAlreadyExist("User with this user name already exist!...");
+//            }else{
+//
+//                Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
+//                //AuthenticationServiceResponse response1 = restTemplate.post
+//                try{
+//                    response = webClient.post()
+//                            .uri("/usersOpr/v1/addNewUser")
+//                            .bodyValue(userDTO)
+//                            .retrieve()
+//                            .bodyToMono(AuthenticationServiceResponse.class)
+//                            .block();
+//
+//                    response.setResponseMsg("User created successfully!...")
+//                            .setIsOprSuccess(true)
+//                            .setStatusCode(HttpStatus.CREATED.toString());
+//                }catch (WebClientResponseException webClientResponseException){
+//                    return ResponseEntity
+//                            .status(webClientResponseException.getStatusCode())
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                            .body(webClientResponseException.getResponseBodyAsString());
+//                }
+//            }
+            /*
+            Commented the above code for handling the race conditions issue.so i had 3 3 options to handle this.
+            Option1:- synchronized(this)
+            i haven't used this because :-> it only works per JVM instance, not across:
+                1.multiple app instances (microservices, scaling).
+                2.multiple nodes
+            Option2:- synchronized(ClassName.class)
+            we will not use this because ->
+                1.Global lock across all threads.
+                2.Kills throughput under load.
+                3.Still doesn’t work in distributed systems
+            Option3:- Correct Approach (Production Standard)
+                1. Enforce uniqueness at DB level(this is mandatory)
+                  ---> @Column(unique = true)
+                        private String userName;
+                2. Remove manual check -> UserUtils.isUserNameAlreadyExist(...)
+                3. Handle exception instead as i did below
+                   This is:-
+                    1.atomic.
+                    2.thread-safe.
+                    3.works across distributed systems.
+            */
+            try{
                 Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
-                //AuthenticationServiceResponse response1 = restTemplate.post
-                try{
-                    response = webClient.post()
-                            .uri("/usersOpr/v1/addNewUser")
-                            .bodyValue(userDTO)
-                            .retrieve()
-                            .bodyToMono(AuthenticationServiceResponse.class)
-                            .block();
+                //Calling userService(microservice) for creating the new user.
+                webClient.post()
+                        .uri("/usersOpr/v1/addNewUser")
+                        .bodyValue(userDTO)
+                        .retrieve()
+                        .bodyToMono(AuthenticationServiceResponse.class)
+                        .block();
 
-                    response.setResponseMsg("User created successfully!...")
-                            .setIsOprSuccess(true)
-                            .setStatusCode(HttpStatus.CREATED.toString());
-                }catch (WebClientResponseException webClientResponseException){
-                    return ResponseEntity
-                            .status(webClientResponseException.getStatusCode())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(webClientResponseException.getResponseBodyAsString());
-                }
+                response.setResponseMsg("User created successfully!...")
+                        .setIsOprSuccess(true)
+                        .setStatusCode(HttpStatus.CREATED.toString());
+            }catch (DataIntegrityViolationException ex) {
+                throw new UserNameAlreadyExist("User with this user name already exist!...");
+            }catch (WebClientResponseException webClientResponseException){
+                return ResponseEntity
+                        .status(webClientResponseException.getStatusCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(webClientResponseException.getResponseBodyAsString());
             }
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
