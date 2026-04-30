@@ -3,6 +3,9 @@ package com.intoThe.service.impl;
 import com.intoThe.dto.request.UserLoginRequest;
 import com.intoThe.dto.response.UserLoginResponse;
 import com.intoThe.entities.Users;
+import com.intoThe.exceptions.SuppliersOprException.InvalidCredentials;
+import com.intoThe.exceptions.SuppliersOprException.UserInactiveException;
+import com.intoThe.exceptions.SuppliersOprException.UserNameNotFound;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -24,27 +27,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserLoginResponse userLogin(UserLoginRequest loginRequest) {
-
         UserLoginResponse userLoginResponse = new UserLoginResponse();
+
         System.out.println(loginRequest.getUserName());
         Optional<Users> user = userRepository.findByUserName(loginRequest.getUserName());
-
         if(user.isEmpty()){
-            return userLoginResponse.setIsLoginSuccess("False")
-                    .setLoginMessage("User not found!...")
-                    .setStatusCode(String.valueOf(HttpStatus.NOT_FOUND));
+            throw new UserNameNotFound("User not found!");
+        }else if("N".equalsIgnoreCase(user.get().getIsUserActive())){
+            throw new UserInactiveException("User account is inactive");
         }
+
         Users users = user.get();
         boolean isPasswordMatched = passwordEncoder.matches(
                 loginRequest.getPassword(),
                 users.getPassword()
         );
-        System.out.println(!users.getPassword().equalsIgnoreCase(loginRequest.getPassword()));
-
         if(!isPasswordMatched){
-            return userLoginResponse.setIsLoginSuccess("False")
-                    .setLoginMessage("Wrong password.")
-                    .setStatusCode(HttpStatus.UNAUTHORIZED + "");
+            throw new InvalidCredentials("Invalid Credentials!");
         }
 
         userLoginResponse.setIsLoginSuccess("True")
