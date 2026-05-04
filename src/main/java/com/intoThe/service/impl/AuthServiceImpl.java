@@ -45,10 +45,8 @@ public class AuthServiceImpl implements AuthService {
         if(!isPasswordMatched){
             throw new InvalidCredentials("Invalid Credentials!");
         }
-
-        userLoginResponse.setIsLoginSuccess("True")
-                .setLoginMessage("Login successful.")
-                .setStatusCode(HttpStatus.OK + "");
         return userLoginResponse;
     }
+
+
 }

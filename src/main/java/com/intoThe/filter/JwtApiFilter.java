@@ -1,5 +1,6 @@
 package com.intoThe.filter;
 
+import com.intoThe.exceptions.SuppliersOprException.JwtTokenValidationException;
 import com.intoThe.service.AuthUserDetailService;
 import com.intoThe.service.impl.AuthServiceImpl;
 import com.intoThe.utils.JWTUtils;
@@ -7,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,18 +20,17 @@ import java.io.IOException;
 
 @Component
 public class JwtApiFilter extends OncePerRequestFilter {
-    private final AuthServiceImpl authService;
     private final JWTUtils jwtUtils;
     private final AuthUserDetailService authUserDetailService;
-    public JwtApiFilter(AuthServiceImpl authService, JWTUtils utils, AuthUserDetailService userDetails){
-        this.authService = authService;
+
+    public JwtApiFilter(JWTUtils utils, AuthUserDetailService userDetails){
         this.jwtUtils = utils;
         this.authUserDetailService =  userDetails;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException, JwtTokenValidationException {
         String authenticationHeader = request.getHeader("Authorization");
         String token = null;
         String userName = null;
@@ -51,5 +52,11 @@ public class JwtApiFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/");
     }
 }

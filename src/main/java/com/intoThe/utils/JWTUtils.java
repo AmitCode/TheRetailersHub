@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Component
 public class JWTUtils {
-    private final SecretKey secreteKey = Keys.hmacShaKeyFor("my-secret-key".getBytes());
+    private final SecretKey secreteKey = Keys.hmacShaKeyFor("my-super-secure-secret-key-1234567890".getBytes());
 
     public String generateJwtToken(String userName){
         String token = "";
@@ -31,16 +31,16 @@ public class JWTUtils {
     }
 
     public Claims getClaims(String token){
-        Claims claims;
         try {
-            claims = Jwts.parser()//parser is deprecated change in the coming future.
+            return Jwts.parserBuilder()
                     .setSigningKey(secreteKey)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
-        }catch (Exception exception){
-            throw new JwtTokenValidationException("Error while extracting the username[" +exception.getMessage()+ "]");
+        } catch (Exception exception){
+            throw new JwtTokenValidationException(
+                    "Error while extracting the username [" + exception.getMessage() + "]");
         }
-        return claims;
     }
 
     public Boolean validateToken(String token, String userName){

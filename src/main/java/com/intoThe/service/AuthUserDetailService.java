@@ -4,6 +4,7 @@ import com.intoThe.entities.Users;
 import com.intoThe.exceptions.SuppliersOprException.JwtTokenValidationException;
 import com.intoThe.exceptions.SuppliersOprException.UserNameNotFound;
 import com.intoThe.repository.UserRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,8 +21,9 @@ public class AuthUserDetailService implements UserDetailsService {
     public AuthUserDetailService(UserRepository repository){
         this.repository = repository;
     }
+    @NotNull
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
         UserDetails userDetails;
         try{
             Optional<Users> userOptional = repository.findByUserName(username);
