@@ -1,6 +1,7 @@
 package com.intoThe.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class Users {
     private Long userId;
     @Column(unique = true)
     private String userName;
+    private String userEmail;
     private String isUserActive;
     private String password;
     @CreationTimestamp

@@ -3,6 +3,7 @@ package com.intoThe.service.impl;
 import com.intoThe.dto.UserDTO;
 import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.entities.Users;
+import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
 import com.intoThe.exceptions.SuppliersOprException.UserNameAlreadyExist;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.repository.UserRepository;
@@ -48,11 +49,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseEntity<?> addUser(UserDTO userDTO) {
-
         userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
-            synchronized (this){
-
-            }
+//            synchronized (this){
+//
+//            }
 
 //            if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
 //                System.out.println("User Name: " + userDTO.getUserName());
@@ -101,7 +101,13 @@ public class UserServiceImpl implements UserService {
                     2.thread-safe.
                     3.works across distributed systems.
             */
-            try{
+        if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
+            throw new UserNameAlreadyExist("User already exists with this username!...");
+        }else if (UserUtils.isUserExistWithEmail(userDTO.getUserEmail(), userRepository)){
+            throw new EmailIdAlreadyExist("User already exists with the Email!...");
+        }else {
+            try {
+
                 Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
                 //Calling userService(microservice) for creating the new user.
                 webClient.post()
@@ -114,16 +120,17 @@ public class UserServiceImpl implements UserService {
                 response.setResponseMsg("User created successfully!...")
                         .setIsOprSuccess(true)
                         .setStatusCode(HttpStatus.CREATED.toString());
-            }catch (DataIntegrityViolationException ex) {
+            } catch (DataIntegrityViolationException ex) {
                 throw new UserNameAlreadyExist("User with this user name already exist!...");
-            }catch (WebClientResponseException webClientResponseException){
+            } catch (WebClientResponseException webClientResponseException) {
                 return ResponseEntity
                         .status(webClientResponseException.getStatusCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(webClientResponseException.getResponseBodyAsString());
             }
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
     }
     /**
      * This method is used to update an existing user in the database.
