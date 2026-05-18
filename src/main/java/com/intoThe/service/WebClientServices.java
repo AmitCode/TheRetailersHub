@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientServices {
     public static ResponseEntity<AuthenticationServiceResponse> callUserService(UserDTO userDTO,
                                                                                 WebClient webClient){
-        ResponseEntity<AuthenticationServiceResponse> response = webClient.post()
+        return webClient.post()
                 .uri("/usersOpr/v1/addNewUser")
                 .bodyValue(userDTO)
                 .retrieve()
