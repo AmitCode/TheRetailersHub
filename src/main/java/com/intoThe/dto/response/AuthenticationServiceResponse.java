@@ -2,12 +2,14 @@ package com.intoThe.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Getter
+@NoArgsConstructor
 public class AuthenticationServiceResponse {
-    private String statusCode;
-    private String responseMsg;
+    private String statusCode = "";
+    private String responseMsg = "";
     private Boolean isOprSuccess;
 
     public AuthenticationServiceResponse setStatusCode(String statusCode) {

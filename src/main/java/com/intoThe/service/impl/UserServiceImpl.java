@@ -8,6 +8,7 @@ import com.intoThe.exceptions.SuppliersOprException.UserNameAlreadyExist;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
+import com.intoThe.service.WebClientServices;
 import com.intoThe.utils.UserUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -46,6 +47,11 @@ public class UserServiceImpl implements UserService {
      * @param userDTO The {@link UserDTO} object containing the details of the user to be added.
      * @return A string indicating that the data has been saved successfully.
      */
+    /*@Transactional:-
+    * This annotation only works inside ONE database transaction.
+    * This will only control the transaction within the auth service.
+    * This will not roll back if the user service or notification service api call fails.\
+    * for this we will have to use Kafka or RabbitMQ for distributed transaction management.*/
     @Override
     @Transactional
     public ResponseEntity<?> addUser(UserDTO userDTO) {
@@ -110,16 +116,15 @@ public class UserServiceImpl implements UserService {
 
                 Users newUser = userRepository.save(userModelMapper.mapToUser(userDTO));
                 //Calling userService(microservice) for creating the new user.
-                webClient.post()
-                        .uri("/usersOpr/v1/addNewUser")
-                        .bodyValue(userDTO)
-                        .retrieve()
-                        .bodyToMono(AuthenticationServiceResponse.class)
-                        .block();
-
-                response.setResponseMsg("User created successfully!...")
-                        .setIsOprSuccess(true)
-                        .setStatusCode(HttpStatus.CREATED.toString());
+                ResponseEntity<AuthenticationServiceResponse> responseEntity = WebClientServices.callUserService(userDTO, webClient);
+                if(responseEntity.getStatusCode().equals(HttpStatus.CREATED)){
+                    response = new AuthenticationServiceResponse();
+                    response.setResponseMsg("User created successfully!...")
+                            .setIsOprSuccess(true)
+                            .setStatusCode(HttpStatus.CREATED.toString());
+                }else{
+                    return responseEntity;
+                }
             } catch (DataIntegrityViolationException ex) {
                 throw new UserNameAlreadyExist("User with this user name already exist!...");
             } catch (WebClientResponseException webClientResponseException) {
@@ -128,7 +133,6 @@ public class UserServiceImpl implements UserService {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(webClientResponseException.getResponseBodyAsString());
             }
-
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
     }
