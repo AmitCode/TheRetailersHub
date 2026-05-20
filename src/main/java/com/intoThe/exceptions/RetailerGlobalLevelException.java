@@ -173,4 +173,31 @@ public class RetailerGlobalLevelException{
                 webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(HashUtils256Exception.class)
+    public ResponseEntity<RetailerExceptionResponse> hashUtils256Exception(
+            HashUtils256Exception exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidToken.class)
+    public ResponseEntity<RetailerExceptionResponse> invalidToken(
+            InvalidToken exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(VerificationTokenException.class)
+    public ResponseEntity<RetailerExceptionResponse> verificationTokenException(
+            VerificationTokenException exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
 }

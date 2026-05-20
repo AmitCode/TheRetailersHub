@@ -30,6 +30,7 @@ public class UserController {
         return userService.addUser(userDTO);
     }
 
+
     /**
      * This endpoint is used to update an existing user in the system.
      *

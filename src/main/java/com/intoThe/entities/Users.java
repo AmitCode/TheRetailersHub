@@ -25,6 +25,7 @@ public class Users {
     private String userEmail;
     private String isUserActive;
     private String password;
+    private String isUserVerified;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @CreationTimestamp
@@ -36,10 +37,14 @@ public class Users {
 
 
     public Users() {
-        this("Y");
+        this("Y", "N");
     }
     public Users(String isUserActive) {
         this.isUserActive = isUserActive;
     }
 
+    public Users(String isUserActive, String isUserVerified) {
+        this.isUserActive = isUserActive;
+        this.isUserVerified = isUserVerified;
+    }
 }

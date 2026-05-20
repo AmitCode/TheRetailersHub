@@ -5,7 +5,6 @@ import com.intoThe.entities.Users;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserDataModelMapper {
 
@@ -15,12 +14,13 @@ public class UserDataModelMapper {
      * @param userDTO The {@link UserDTO} object to be mapped.
      * @return The mapped {@link Users} entity object.
      */
-    public Users mapToUser(UserDTO userDTO){
+    public static Users mapToUser(UserDTO userDTO){
 
         Users users = new Users();
         users.setUserName(userDTO.getUserName());
         users.setPassword(userDTO.getUserPassword());
         users.setIsUserActive(users.getIsUserActive());
+        users.setUserEmail(userDTO.getUserEmail());
 
 //        List<Address> addresses = userDTO.getAddresses().stream()
 //                //.map(addressDTO -> AddressModelMapper.mapToAddress(addressDTO))writing it to method reference
@@ -39,13 +39,14 @@ public class UserDataModelMapper {
      * @param users The {@link Users} entity object to be mapped.
      * @return The mapped {@link UserDTO} object.
      */
-    public UserDTO mapToUserDTO(Users users){
+    public static UserDTO mapToUserDTO(Users users){
 
         UserDTO userDTO = new UserDTO();
         userDTO.setUserId(users.getUserId());
         userDTO.setUserName(users.getUserName());
         userDTO.setIsUserActive(users.getIsUserActive());
         userDTO.setUserPassword(users.getPassword());
+        userDTO.setUserEmail(users.getUserEmail());
 
 //        List<AddressDTO> addresses = users.getAddresses().stream()
 //                .map(AddressModelMapper::mapToAddressDTO)

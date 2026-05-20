@@ -26,4 +26,8 @@ public class AuthenticationServiceResponse {
         this.isOprSuccess = isOprSuccess;
         return this;
     }
+
+    public static AuthenticationServiceResponse createResponse(){
+        return new AuthenticationServiceResponse();
+    }
 }

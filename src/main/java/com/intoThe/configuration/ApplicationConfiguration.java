@@ -7,10 +7,19 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class ApplicationConfiguration {
+    @Value("${notificationServiceBaseUrl}")
+    private String notificationServiceBaseUrl;
+
     @Value("${userServiceBaseUrl}")
     private String userServiceBaseUrl;
-    @Bean
-    public WebClient webClient(){
+
+    @Bean(name = "notificationServiceWebClient")
+    public WebClient notificationServiceWebClient(){
+        return WebClient.builder().baseUrl(notificationServiceBaseUrl).build();
+    }
+
+    @Bean(name = "userServiceWebClient")
+    public WebClient userServiceWebClient(){
         return WebClient.builder().baseUrl(userServiceBaseUrl).build();
     }
 }
