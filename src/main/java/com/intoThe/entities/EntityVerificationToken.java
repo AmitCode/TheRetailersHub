@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 
@@ -19,16 +20,19 @@ public class EntityVerificationToken {
     private long userId;
     private String verificationToken;
     private String tokenHashType;
-    private String isVerified;
+    private Boolean isVerified;
     @CreationTimestamp
     private LocalDateTime tokenGeneratedAt;
+    @Value("${verification.token.expiry.time}")
     private int tokenValidDuration;
+    @Value("${verification.token.expiry.time.unit}")
+    private int tokenValidDurationUnit;
 
     public EntityVerificationToken() {
-        this("N");
+        this(false);
     }
 
-    public EntityVerificationToken(String isVerified) {
+    public EntityVerificationToken(Boolean isVerified) {
         this.isVerified = isVerified;
     }
 
@@ -56,7 +60,7 @@ public class EntityVerificationToken {
         return this;
     }
 
-    public EntityVerificationToken setIsVerified(String isVerified) {
+    public EntityVerificationToken setIsVerified(Boolean isVerified) {
         this.isVerified = isVerified;
         return this;
     }

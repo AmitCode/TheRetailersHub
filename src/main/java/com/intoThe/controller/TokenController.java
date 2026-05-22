@@ -3,10 +3,7 @@ package com.intoThe.controller;
 import com.intoThe.service.impl.TokenVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/verify")
@@ -18,7 +15,12 @@ public class TokenController {
     }
 
     @PostMapping("/verifyUserAccount")
-    public ResponseEntity<?> verifyUser(@RequestParam String verificationToken){
+    public ResponseEntity<?> verifyUser(@RequestParam String verificationToken) throws Exception {
         return new ResponseEntity<>(verificationService.verifyToken(verificationToken), HttpStatus.OK);
+    }
+
+    @PostMapping("/regenerateToken")
+    private ResponseEntity<?> regenerateToken(@RequestHeader String userEmail){
+        return verificationService.regenerateVerificationLink(userEmail);
     }
 }

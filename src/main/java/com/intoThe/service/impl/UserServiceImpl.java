@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final EntityVerificationTokenRepository tokenRepository;
     private final WebClient notificationServiceWebClient;
+    private final WebClient userServiceWebClient;
     //private final RestTemplate restTemplate;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
     AuthenticationServiceResponse response;
@@ -45,11 +46,13 @@ public class UserServiceImpl implements UserService {
     //@Autowired ----> // @Autowired needed — ONLY ONE constructor
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
                            @Qualifier("notificationServiceWebClient") WebClient webClient,
+                           @Qualifier("userServiceWebClient") WebClient userServiceWebClient,
                            EntityVerificationTokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.notificationServiceWebClient = webClient;
         this.tokenRepository = tokenRepository;
+        this.userServiceWebClient = userServiceWebClient;
         //this.restTemplate = restTemplate;
     }
 
@@ -170,11 +173,11 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
                     hashToken, "SHA-256", newUser.getUserId(), newUser.getUserName()
             );
-            tokenRepository.save(verificationToken);
 
+            tokenRepository.save(verificationToken);
             EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(newUser, hashToken);
             ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
-                    .callEmailNotificationService(emailRequest, notificationServiceWebClient);
+                    .callEmailNotificationService("email/sendMail", emailRequest, notificationServiceWebClient);
 
             response = AuthenticationServiceResponse.createResponse()
                     .setResponseMsg("User created successfully!...")
@@ -199,11 +202,12 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
      * @param userDTO The {@link UserDTO} object containing the details of the user to be updated.
      * @return The updated {@link UserDTO} object.
      */
+    @Transactional
     @Override
     public UserDTO updateUser(UserDTO userDTO){
 
-        Long userId = userDTO.getUserId();
-        Users users = UserUtils.isUserExist(userId,userRepository);
+        String userName = userDTO.getUserName();
+        Users users = UserUtils.isUserExist(userName,userRepository);
         users.setUserName(userDTO.getUserName());
         users.setIsUserActive(userDTO.getIsUserActive());
         users.setPassword(userDTO.getUserPassword());
@@ -215,38 +219,71 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
     /**
      * This method is used to delete an existing user from the database.
      *
-     * @param userId The ID of the user to be deleted.
+     * @param userName The ID of the user to be deleted.
      * @return A string indicating that the user has been successfully deleted.
      */
+    @Transactional
     @Override
-    public String deleteUser(Long userId) {
-        Users users = UserUtils.isUserExist(userId,userRepository);
-        userRepository.deleteById(userId);
-        return "User has been deleted!...";
+    public ResponseEntity<AuthenticationServiceResponse> deleteUser(String userName) {
+        Users users = UserUtils.isUserExist(userName,userRepository);
+
+        ResponseEntity<AuthenticationServiceResponse> authenticationServiceResponse = WebClientServices
+                .callUserServiceDeleteUser("/deleteUser", userName, userServiceWebClient);
+
+        if(authenticationServiceResponse.getStatusCode().is2xxSuccessful()){
+            userRepository.deleteByUserName(userName);
+            response = AuthenticationServiceResponse.createResponse()
+                    .setStatusCode(HttpStatus.ACCEPTED.toString())
+                    .setResponseMsg("User has been deleted successfully!...")
+                    .setIsOprSuccess(true);
+        }else{
+            response = AuthenticationServiceResponse.createResponse()
+                    .setStatusCode(authenticationServiceResponse.getBody().getStatusCode())
+                    .setResponseMsg(authenticationServiceResponse.getBody().getResponseMsg())
+                    .setIsOprSuccess(false);
+        }
+
+        return new ResponseEntity<> (response, HttpStatus.ACCEPTED);
     }
 
     /**
      * This method is used to activate or deactivate a user in the database.
      *
-     * @param userId The ID of the user to be activated or deactivated.
+     * @param userName The ID of the user to be activated or deactivated.
      * @param isActive A string that is case-insensitive and can only be "Y" for activation or "N" for deactivation.
      * @return A string indicating that the user has been successfully activated or deactivated.
      * @throws IllegalArgumentException if the isActive parameter is neither "Y" nor "N".
      */
+    @Transactional
     @Override
-    public String activateOrDeactivate(Long userId, String isActive) {
-        Users users = UserUtils.isUserExist(userId,userRepository);
+    public ResponseEntity<AuthenticationServiceResponse> activateOrDeactivate(String userName, Boolean isActive) {
+        Users users = UserUtils.isUserExist(userName,userRepository);
         users.setIsUserActive(isActive);
-        users = userRepository.save(users);
-        if (isActive.equalsIgnoreCase("Y"))
-            return "User has been Activated!...";
-        return "User has been Deactivated!...";
+
+        ResponseEntity<AuthenticationServiceResponse> authenticationServiceResponse = WebClientServices
+                .callUserServiceActiveAndDeActivate("/deleteUser", userName, isActive, userServiceWebClient);
+
+        if(authenticationServiceResponse.getStatusCode().is2xxSuccessful()){
+            userRepository.deleteByUserName(userName);
+            response = AuthenticationServiceResponse.createResponse()
+                    .setStatusCode(HttpStatus.ACCEPTED.toString())
+                    .setResponseMsg((isActive) ? "User has been deleted successfully!..."
+                            : "User has been Deactivated!...")
+                    .setIsOprSuccess(true);
+        }else{
+            response = AuthenticationServiceResponse.createResponse()
+                    .setStatusCode(authenticationServiceResponse.getBody().getStatusCode())
+                    .setResponseMsg(authenticationServiceResponse.getBody().getResponseMsg())
+                    .setIsOprSuccess(false);
+        }
+
+        return new ResponseEntity<> (response, HttpStatus.ACCEPTED);
     }
 
     /**
      * This method is used to get the user information for a given userId.
      *
-     * @param userId The userId of the user to get the information for.
+     * @param userName The userId of the user to get the information for.
     /**
      *
 
@@ -254,9 +291,10 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
 
      * @return A {@link UserDTO} object containing the information of the user.
      */
+    @Transactional
     @Override
-    public UserDTO getUserInfo(Long userId) {
-        return UserDataModelMapper.mapToUserDTO(UserUtils.isUserExist(userId,userRepository));
+    public UserDTO getUserInfo(String userName) {
+        return UserDataModelMapper.mapToUserDTO(UserUtils.isUserExist(userName,userRepository));
     }
 
     /**
@@ -264,6 +302,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
      *
      * @return A list of {@link UserDTO} objects representing all users in the database.
      */
+    @Transactional
     @Override
     public List<UserDTO> getAllUsers() {
         List<Users> usersList = userRepository.findAll();

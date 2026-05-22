@@ -1,6 +1,7 @@
 package com.intoThe.controller;
 
 import com.intoThe.dto.UserDTO;
+import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -46,12 +47,12 @@ public class UserController {
     /**
      * This endpoint is used to retrieve the user information for a specified user ID.
      *
-     * @param userId The ID of the user to retrieve information for.
+     * @param userName The ID of the user to retrieve information for.
      * @return The user information wrapped in a {@link ResponseEntity} object, with an HTTP status of {@link HttpStatus#FOUND}.
      */
     @GetMapping("/getUserInfoById")
-    public ResponseEntity<UserDTO> getUserById(@RequestHeader Long userId){
-        return new ResponseEntity<>(userService.getUserInfo(userId),HttpStatus.FOUND);
+    public ResponseEntity<UserDTO> getUserById(@RequestHeader String userName){
+        return new ResponseEntity<>(userService.getUserInfo(userName),HttpStatus.FOUND);
     }
 
     /**
@@ -68,17 +69,21 @@ public class UserController {
     /**
      * This endpoint is used to activate or deactivate a user in the system.
      *
-     * @param userId The ID of the user to be activated or deactivated.
-     * @param isActive A string that is case-insensitive and can only be "Y" for activation or "N" for deactivation.
+     * @param userName The ID of the user to be activated or deactivated.
+     * @param isActive A string that is case-insensitive and can only be true for activation or false for deactivation.
      * @return A {@link ResponseEntity} object containing a string indicating that the user has been successfully activated or deactivated,
      *         with an HTTP status of {@link HttpStatus#ACCEPTED}.
-     * @throws IllegalArgumentException if the isActive parameter is neither "Y" nor "N".
+     * @throws IllegalArgumentException if the isActive parameter is neither true nor false.
      */
     @PatchMapping("/activateOrDeactivateUser")
-    public ResponseEntity<String> modifyUserStatus(@RequestHeader Long userId,
-                                                   @RequestHeader String isActive){
-        return new ResponseEntity<>(userService.
-                activateOrDeactivate(userId,isActive),HttpStatus.ACCEPTED);
+    public ResponseEntity<AuthenticationServiceResponse> modifyUserStatus(@RequestHeader String userName,
+                                                   @RequestHeader Boolean isActive){
+        return userService.activateOrDeactivate(userName, isActive);
+    }
+
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<AuthenticationServiceResponse> deleteUser(@Valid @RequestHeader String userName){
+        return userService.deleteUser(userName);
     }
 
 }

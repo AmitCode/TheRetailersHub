@@ -200,4 +200,13 @@ public class RetailerGlobalLevelException{
                 webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(VerificationTokenExpired.class)
+    public ResponseEntity<RetailerExceptionResponse> verificationTokenExpiredException(
+            VerificationTokenExpired exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
 }

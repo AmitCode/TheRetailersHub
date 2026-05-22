@@ -13,15 +13,15 @@ public class UserUtils {
     /**
      * Checks if a user exists in the database.
      *
-     * @param userId The ID of the user to be checked.
+     * @param userName The ID of the user to be checked.
      * @param userRepository The repository to use for the check.
      * @return The user object if the user exists, null otherwise.
      * @throws SuppliersOprExceptionHandler if the user does not exist.
      */
-    public static Users isUserExist(Long userId, UserRepository userRepository) {
+    public static Users isUserExist(String userName, UserRepository userRepository) {
 
-        return userRepository.findById(userId)
-                .orElseThrow(() -> (new ResourceNotFound("User with this id :" + userId + " not found!...")));
+        return userRepository.findByUserName(userName)
+                .orElseThrow(() -> (new ResourceNotFound("User with this id :" + userName + " not found!...")));
     }
 
     /**

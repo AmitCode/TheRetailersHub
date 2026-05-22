@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
         Optional<Users> user = userRepository.findByUserName(loginRequest.getUserName());
         if(user.isEmpty()){
             throw new UserNameNotFound("User not found!");
-        }else if("N".equalsIgnoreCase(user.get().getIsUserActive())){
+        }else if(user.get().getIsUserActive()){
             throw new UserInactiveException("User account is inactive");
         }
 

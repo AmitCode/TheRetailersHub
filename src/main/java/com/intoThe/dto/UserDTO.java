@@ -18,7 +18,7 @@ public class UserDTO {
     @NotBlank(message = "User Email can't be null")
     @Email(message = "Email must be in proper format!...")
     private String userEmail;
-    private String isUserActive;
+    private Boolean isUserActive;
     @NotBlank(message = "User Password can't be empty!...")
     private String userPassword;
 

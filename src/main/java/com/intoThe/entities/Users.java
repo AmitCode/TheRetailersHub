@@ -23,9 +23,9 @@ public class Users {
     @Column(unique = true)
     private String userName;
     private String userEmail;
-    private String isUserActive;
+    private Boolean isUserActive;
     private String password;
-    private String isUserVerified;
+    private Boolean isUserVerified;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @CreationTimestamp
@@ -37,13 +37,13 @@ public class Users {
 
 
     public Users() {
-        this("Y", "N");
+        this(true, false);
     }
-    public Users(String isUserActive) {
+    public Users(Boolean isUserActive) {
         this.isUserActive = isUserActive;
     }
 
-    public Users(String isUserActive, String isUserVerified) {
+    public Users(Boolean isUserActive, Boolean isUserVerified) {
         this.isUserActive = isUserActive;
         this.isUserVerified = isUserVerified;
     }
