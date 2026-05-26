@@ -209,4 +209,22 @@ public class RetailerGlobalLevelException{
                 webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<RetailerExceptionResponse> internalServerErrorException(
+            InternalServerErrorException exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<RetailerExceptionResponse> passwordMismatchException(
+            PasswordMismatchException exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
 }

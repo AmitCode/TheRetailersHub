@@ -2,12 +2,12 @@ package com.intoThe.service.impl;
 
 import com.intoThe.dto.UserDTO;
 import com.intoThe.dto.request.EmailRequest;
+import com.intoThe.dto.request.PasswordResetRequest;
 import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.dto.response.EmailServiceResponse;
 import com.intoThe.entities.EntityVerificationToken;
 import com.intoThe.entities.Users;
-import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
-import com.intoThe.exceptions.SuppliersOprException.UserNameAlreadyExist;
+import com.intoThe.exceptions.SuppliersOprException.*;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.mapper.VerificationTokenModelMapper;
 import com.intoThe.repository.EntityVerificationTokenRepository;
@@ -17,7 +17,10 @@ import com.intoThe.service.WebClientServices;
 import com.intoThe.utils.AuthServiceUtils;
 import com.intoThe.utils.HashUtils;
 import com.intoThe.utils.UserUtils;
-import com.intoThe.utils.VerificationUtils;
+import com.intoThe.utils.VerificationTokenUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +33,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -39,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final EntityVerificationTokenRepository tokenRepository;
     private final WebClient notificationServiceWebClient;
     private final WebClient userServiceWebClient;
+    private final EntityManager entityManager;
     //private final RestTemplate restTemplate;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
     AuthenticationServiceResponse response;
@@ -47,12 +52,14 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
                            @Qualifier("notificationServiceWebClient") WebClient webClient,
                            @Qualifier("userServiceWebClient") WebClient userServiceWebClient,
-                           EntityVerificationTokenRepository tokenRepository) {
+                           EntityVerificationTokenRepository tokenRepository,
+                           EntityManager entityManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.notificationServiceWebClient = webClient;
         this.tokenRepository = tokenRepository;
         this.userServiceWebClient = userServiceWebClient;
+        this.entityManager = entityManager;
         //this.restTemplate = restTemplate;
     }
 
@@ -76,7 +83,7 @@ public class UserServiceImpl implements UserService {
 ////            }
 //
 ////            if(UserUtils.isUserNameAlreadyExist(userDTO.getUserName(), userRepository)){
-////                System.out.println("User Name: " + userDTO.getUserName());
+////                System.out.println("Username: " + userDTO.getUserName());
 ////                throw  new UserNameAlreadyExist("User with this user name already exist!...");
 ////            }else{
 ////
@@ -93,7 +100,7 @@ public class UserServiceImpl implements UserService {
 ////                    response.setResponseMsg("User created successfully!...")
 ////                            .setIsOprSuccess(true)
 ////                            .setStatusCode(HttpStatus.CREATED.toString());
-////                }catch (WebClientResponseException webClientResponseException){
+////                }catch (WebClientResponseException){
 ////                    return ResponseEntity
 ////                            .status(webClientResponseException.getStatusCode())
 ////                            .contentType(MediaType.APPLICATION_JSON)
@@ -168,14 +175,14 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             userDTO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
             Users newUser = userRepository.save(UserDataModelMapper.mapToUser(userDTO));
 
-            String token = VerificationUtils.generateVerificationToken();
+            String token = VerificationTokenUtils.generateVerificationToken();
             String hashToken = HashUtils.getSHA256Hash(token);
             EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
                     hashToken, "SHA-256", newUser.getUserId(), newUser.getUserName()
             );
 
             tokenRepository.save(verificationToken);
-            EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(newUser, hashToken);
+            EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(newUser, hashToken, "REG");
             ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
                     .callEmailNotificationService("email/sendMail", emailRequest, notificationServiceWebClient);
 
@@ -261,7 +268,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
         users.setIsUserActive(isActive);
 
         ResponseEntity<AuthenticationServiceResponse> authenticationServiceResponse = WebClientServices
-                .callUserServiceActiveAndDeActivate("/deleteUser", userName, isActive, userServiceWebClient);
+                .callUserServiceActiveAndDeActivate("/activateOrDeactivateUser", userName, isActive, userServiceWebClient);
 
         if(authenticationServiceResponse.getStatusCode().is2xxSuccessful()){
             userRepository.deleteByUserName(userName);
@@ -308,4 +315,73 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
         List<Users> usersList = userRepository.findAll();
         return userModelMapper.mapToListOfUserDTO(usersList);
     }
+
+    @Override
+    public ResponseEntity<AuthenticationServiceResponse> passwordResetRequest(String userEmail){
+        try{
+            String token = VerificationTokenUtils.generateVerificationToken();
+            String hashToken = HashUtils.getSHA256Hash(token);
+
+            Optional<Users> usersOptional = userRepository.findByUserEmailId(userEmail);
+            if(usersOptional.isPresent()){
+                Users users = usersOptional.get();
+                EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
+                        hashToken, "SHA-256", users.getUserId(), users.getUserName()
+                );
+                tokenRepository.save(verificationToken);
+
+                EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(users, hashToken,
+                        "PASS-RESET");
+                ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
+                        .callEmailNotificationService("email/sendMail", emailRequest, notificationServiceWebClient);
+            }
+
+        }catch (Exception exception) {
+            throw new InternalServerErrorException("[Auth Service]-{passwordReset} Ex- "
+                    +exception.getMessage());
+        }finally {
+            response = AuthenticationServiceResponse.createResponse()
+                    .setIsOprSuccess(true)
+                    .setResponseMsg("")
+                    .setStatusCode(HttpStatus.ACCEPTED.toString());
+        }
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
+    public ResponseEntity<AuthenticationServiceResponse> passwordReset(PasswordResetRequest passwordResetRequest) {
+        try{
+            Optional<EntityVerificationToken> tokenOptional = tokenRepository.findByVerificationToken(
+                    passwordResetRequest.getToken()
+            );
+            if(tokenOptional.isEmpty())
+                throw new InvalidToken("Invalid verification token!...");
+
+            EntityVerificationToken verificationTokenInfo = tokenOptional.get();
+            Optional<Users> usersOptional = userRepository.findByUserId(verificationTokenInfo.getUserId());
+            if(usersOptional.isEmpty())
+                throw new ResourceNotFound("User not found with userId associated with token!...");
+
+            Users users = usersOptional.get();
+            boolean isPasswordMatched = passwordEncoder.matches(users.getPassword(),
+                    passwordResetRequest.getOldPassword());
+            if(isPasswordMatched)
+                throw new InvalidCredentials("Old password is wrong!...");
+
+            String sqlScript = "UPDATE INTO_USER_DATA SET PASSWORD = ?  WHERE USER_ID = ?";
+            Query query = entityManager.createNativeQuery(sqlScript);
+            entityManager.setProperty(passwordEncoder.encode(passwordResetRequest.getNewPassword()),
+                    users.getUserId());
+            query.executeUpdate();
+
+            response = AuthenticationServiceResponse.createResponse()
+                    .setResponseMsg("Password has changed successfully!...")
+                    .setStatusCode(HttpStatus.ACCEPTED.toString())
+                    .setIsOprSuccess(true);
+        }catch (Exception exception){
+            throw new InternalServerErrorException("[Exception]-{Password Change}-Ex: "
+                    +exception.getMessage());
+        }
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
 }

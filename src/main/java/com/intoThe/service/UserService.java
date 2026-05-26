@@ -1,6 +1,7 @@
 package com.intoThe.service;
 
 import com.intoThe.dto.UserDTO;
+import com.intoThe.dto.request.PasswordResetRequest;
 import com.intoThe.dto.response.AuthenticationServiceResponse;
 import org.springframework.http.ResponseEntity;
 
@@ -13,4 +14,6 @@ public interface UserService {
     public ResponseEntity<AuthenticationServiceResponse> activateOrDeactivate(String userName, Boolean isActive);
     public UserDTO getUserInfo(String userName);
     public List<UserDTO> getAllUsers();
+    public ResponseEntity<AuthenticationServiceResponse> passwordResetRequest(String userEmail);
+    public ResponseEntity<AuthenticationServiceResponse> passwordReset(PasswordResetRequest passwordResetRequest);
 }

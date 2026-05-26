@@ -13,6 +13,7 @@ public class EmailRequest {
     private String emailType;
     private String emailSubject;
     private String verificationUrl;
+    private String tokenDuration;
 
     public EmailRequest setUserName(String userName) {
         this.userName = userName;
@@ -36,6 +37,11 @@ public class EmailRequest {
 
     public EmailRequest setVerificationUrl(String verificationUrl) {
         this.verificationUrl = verificationUrl;
+        return this;
+    }
+
+    public EmailRequest setTokenDuration(String tokenDuration) {
+        this.tokenDuration = tokenDuration;
         return this;
     }
 

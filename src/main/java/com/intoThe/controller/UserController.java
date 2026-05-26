@@ -1,13 +1,17 @@
 package com.intoThe.controller;
 
 import com.intoThe.dto.UserDTO;
+import com.intoThe.dto.request.PasswordResetRequest;
 import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.List;
 
 @RestController
@@ -84,6 +88,20 @@ public class UserController {
     @DeleteMapping("/deleteUser")
     public ResponseEntity<AuthenticationServiceResponse> deleteUser(@Valid @RequestHeader String userName){
         return userService.deleteUser(userName);
+    }
+
+    @PostMapping("/password-reset-request")
+    public ResponseEntity<AuthenticationServiceResponse> passwordResetRequest(
+            @NotBlank(message = "Email Id can't be empty")
+            @Email(message = "Email Id should be in proper format")
+            @RequestParam String userEmail){
+
+        return userService.passwordResetRequest(userEmail);
+    }
+
+    public ResponseEntity<AuthenticationServiceResponse> passwordReset(
+            @Valid @RequestBody PasswordResetRequest passwordResetRequest) {
+        return userService.passwordReset(passwordResetRequest);
     }
 
 }

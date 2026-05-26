@@ -16,7 +16,7 @@ import com.intoThe.repository.UserRepository;
 import com.intoThe.service.WebClientServices;
 import com.intoThe.utils.AuthServiceUtils;
 import com.intoThe.utils.HashUtils;
-import com.intoThe.utils.VerificationUtils;
+import com.intoThe.utils.VerificationTokenUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +62,7 @@ public class TokenVerificationService {
             throw new VerificationTokenException("User already verified!...");
         }
 
-        if(VerificationUtils. isTokenExpired(entityVerificationToken.getTokenGeneratedAt(), verificationExpiryTimeUnit)){
+        if(VerificationTokenUtils. isTokenExpired(entityVerificationToken.getTokenGeneratedAt(), verificationExpiryTimeUnit)){
             throw new VerificationTokenExpired("Token has expired!...");
         }
 
@@ -90,14 +90,14 @@ public class TokenVerificationService {
             if(usersOptional.isPresent()){
                 Users users = usersOptional.get();
                 if(users.getIsUserVerified()){
-                    String token = VerificationUtils.generateVerificationToken();
+                    String token = VerificationTokenUtils.generateVerificationToken();
                     String hashToken = HashUtils.getSHA256Hash(token);
                     EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
                             hashToken, "SHA-256", users.getUserId(), users.getUserName()
                     );
 
                     verificationTokenRepository.save(verificationToken);
-                    EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(users, hashToken);
+                    EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(users, hashToken, "REG");
                     ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
                             .callEmailNotificationService("email/sendMail" ,emailRequest, notificationServiceWebClient);
                 }else{

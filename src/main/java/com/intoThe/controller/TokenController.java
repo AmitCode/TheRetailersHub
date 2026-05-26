@@ -14,7 +14,7 @@ public class TokenController {
         this.verificationService = verificationService;
     }
 
-    @PostMapping("/verifyUserAccount")
+    @GetMapping("/verifyUserAccount")
     public ResponseEntity<?> verifyUser(@RequestParam String verificationToken) throws Exception {
         return new ResponseEntity<>(verificationService.verifyToken(verificationToken), HttpStatus.OK);
     }
