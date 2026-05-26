@@ -7,8 +7,6 @@ import java.util.Base64;
 public class VerificationTokenUtils {
     private static final SecureRandom secureRandomNumber = new SecureRandom();
 
-    public static
-
     public static String generateVerificationToken(){
         byte[] tokenBytes = new byte[32];
         secureRandomNumber.nextBytes(tokenBytes);
