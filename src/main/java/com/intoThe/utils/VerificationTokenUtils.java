@@ -10,7 +10,6 @@ public class VerificationTokenUtils {
     public static String generateVerificationToken(){
         byte[] tokenBytes = new byte[32];
         secureRandomNumber.nextBytes(tokenBytes);
-
         return Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(tokenBytes);

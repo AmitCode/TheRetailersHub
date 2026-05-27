@@ -8,7 +8,6 @@ import com.intoThe.exceptions.SuppliersOprException.UserInactiveException;
 import com.intoThe.exceptions.SuppliersOprException.UserNameNotFound;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.AuthService;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

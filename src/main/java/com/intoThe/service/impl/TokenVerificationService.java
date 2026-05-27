@@ -86,7 +86,7 @@ public class TokenVerificationService {
     public ResponseEntity<AuthenticationServiceResponse> regenerateVerificationLink(String userEmail){
         AuthenticationServiceResponse authenticationServiceResponse;
         try {
-            Optional<Users> usersOptional = userRepository.findByUserEmailId(userEmail);
+            Optional<Users> usersOptional = userRepository.findByUserEmail(userEmail);
             if(usersOptional.isPresent()){
                 Users users = usersOptional.get();
                 if(users.getIsUserVerified()){

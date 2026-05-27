@@ -322,7 +322,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             String token = VerificationTokenUtils.generateVerificationToken();
             String hashToken = HashUtils.getSHA256Hash(token);
 
-            Optional<Users> usersOptional = userRepository.findByUserEmailId(userEmail);
+            Optional<Users> usersOptional = userRepository.findByUserEmail(userEmail);
             if(usersOptional.isPresent()){
                 Users users = usersOptional.get();
                 EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(

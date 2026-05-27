@@ -8,7 +8,6 @@ public class VerificationTokenModelMapper {
         return EntityVerificationToken.createEntityVerificationToken()
                 .setVerificationToken(token)
                 .setTokenHashType(tokeHashType)
-                .setTokenValidDuration(15)
                 .setUserId(userId);
     }
 }
