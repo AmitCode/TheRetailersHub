@@ -16,4 +16,5 @@ public interface UserService {
     public List<UserDTO> getAllUsers();
     public ResponseEntity<AuthenticationServiceResponse> passwordResetRequest(String userEmail);
     public ResponseEntity<AuthenticationServiceResponse> passwordReset(PasswordResetRequest passwordResetRequest);
+    public ResponseEntity<AuthenticationServiceResponse> forgotPasswordRequest(String userEmailId);
 }

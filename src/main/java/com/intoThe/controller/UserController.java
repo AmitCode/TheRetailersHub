@@ -99,9 +99,17 @@ public class UserController {
         return userService.passwordResetRequest(userEmail);
     }
 
+    @PostMapping("/password-reset")
     public ResponseEntity<AuthenticationServiceResponse> passwordReset(
             @Valid @RequestBody PasswordResetRequest passwordResetRequest) {
         return userService.passwordReset(passwordResetRequest);
+    }
+
+    @PostMapping("/forgot-password-request")
+    public ResponseEntity<AuthenticationServiceResponse> forgotPasswordRequest(
+            @NotBlank(message = "User Email Id can't be blank") @RequestParam String userEmailId
+    ){
+        return userService.forgotPasswordRequest(userEmailId);
     }
 
 }

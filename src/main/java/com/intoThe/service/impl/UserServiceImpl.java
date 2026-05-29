@@ -6,20 +6,19 @@ import com.intoThe.dto.request.PasswordResetRequest;
 import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.dto.response.EmailServiceResponse;
 import com.intoThe.entities.EntityVerificationToken;
+import com.intoThe.entities.OtpEntity;
 import com.intoThe.entities.Users;
+import com.intoThe.enums.OtpTypes;
 import com.intoThe.exceptions.SuppliersOprException.*;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.mapper.VerificationTokenModelMapper;
 import com.intoThe.repository.EntityVerificationTokenRepository;
+import com.intoThe.repository.OtpRepository;
 import com.intoThe.repository.UserRepository;
 import com.intoThe.service.UserService;
 import com.intoThe.service.WebClientServices;
-import com.intoThe.utils.AuthServiceUtils;
-import com.intoThe.utils.HashUtils;
-import com.intoThe.utils.UserUtils;
-import com.intoThe.utils.VerificationTokenUtils;
+import com.intoThe.utils.*;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final EntityVerificationTokenRepository tokenRepository;
+    private final OtpRepository otpRepository;
     private final WebClient notificationServiceWebClient;
     private final WebClient userServiceWebClient;
     private final EntityManager entityManager;
@@ -53,13 +53,15 @@ public class UserServiceImpl implements UserService {
                            @Qualifier("notificationServiceWebClient") WebClient webClient,
                            @Qualifier("userServiceWebClient") WebClient userServiceWebClient,
                            EntityVerificationTokenRepository tokenRepository,
-                           EntityManager entityManager) {
+                           EntityManager entityManager,
+                           OtpRepository otpRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.notificationServiceWebClient = webClient;
         this.tokenRepository = tokenRepository;
         this.userServiceWebClient = userServiceWebClient;
         this.entityManager = entityManager;
+        this.otpRepository = otpRepository;
         //this.restTemplate = restTemplate;
     }
 
@@ -182,7 +184,8 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             );
 
             tokenRepository.save(verificationToken);
-            EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(newUser, hashToken, "REG");
+            EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(newUser, hashToken, "REG",
+                    "Verify Your User Account");
             ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
                     .callEmailNotificationService("email/sendMail", emailRequest, notificationServiceWebClient);
 
@@ -331,7 +334,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
                 tokenRepository.save(verificationToken);
 
                 EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(users, hashToken,
-                        "PASS-RESET");
+                        "PASS-RESET", "Reset your password for your candidate account");
                 ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
                         .callEmailNotificationService("email/sendMail", emailRequest, notificationServiceWebClient);
             }
@@ -378,10 +381,47 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
                     .setStatusCode(HttpStatus.ACCEPTED.toString())
                     .setIsOprSuccess(true);
         }catch (Exception exception){
-            throw new InternalServerErrorException("[Exception]-{Password Change}-Ex: "
+            throw new InternalServerErrorException("[Password Change] Exception occurred Ex-"
                     +exception.getMessage());
         }
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<AuthenticationServiceResponse> forgotPasswordRequest(String userEmailId){
+        try{
+            Optional<Users> usersOptional = userRepository.findByUserEmail(userEmailId);
+
+            if(usersOptional.isPresent()){
+
+                Users users = usersOptional.get();
+                String otp = OtpUtils.generateOtp();
+                OtpEntity otpEntity = OtpEntity.getOtpEntity()
+                        .setUserId(users.getUserId())
+                        .setOtpTypes(OtpTypes.EMAIL_OTP_VERIFICATION)
+                        .setOpt(otp)
+                        .setUserEmail(userEmailId);
+
+                otpRepository.save(otpEntity);
+                EmailRequest emailRequest = AuthServiceUtils.prepareSendOtpEmailRequest(otp,
+                        "OTP_VERIFICATION", "Forgot Password Email Verification",
+                        userEmailId);
+                WebClientServices.callEmailNotificationService(
+                        "email/sendMail", emailRequest, notificationServiceWebClient
+                );
+            }
+
+        }catch (Exception exception){
+            throw new InternalServerErrorException("[Forgot Password Request] Exception occurred Ex-"
+                    + exception.getMessage());
+        }finally {
+            response = AuthenticationServiceResponse.createResponse()
+                    .setResponseMsg("If the email exists, OTP has been sent.")
+                    .setIsOprSuccess(true)
+                    .setStatusCode(HttpStatus.OK.toString());
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

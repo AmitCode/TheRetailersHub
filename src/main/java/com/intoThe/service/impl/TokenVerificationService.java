@@ -97,7 +97,8 @@ public class TokenVerificationService {
                     );
 
                     verificationTokenRepository.save(verificationToken);
-                    EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(users, hashToken, "REG");
+                    EmailRequest emailRequest = AuthServiceUtils.prepareEmailRequest(users, hashToken, "REG",
+                            "Verify Your User Account");
                     ResponseEntity<EmailServiceResponse> responseEntity = WebClientServices
                             .callEmailNotificationService("email/sendMail" ,emailRequest, notificationServiceWebClient);
                 }else{

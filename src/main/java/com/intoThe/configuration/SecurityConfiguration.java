@@ -40,7 +40,7 @@ public class SecurityConfiguration {
         return security.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/login", "/auth/register", "/userService/createNewUser",
-                                        "/verify/verifyUserAccount").permitAll()
+                                        "/verify/verifyUserAccount", "/userService/forgot-password-request").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

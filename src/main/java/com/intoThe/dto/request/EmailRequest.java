@@ -14,6 +14,7 @@ public class EmailRequest {
     private String emailSubject;
     private String verificationUrl;
     private String tokenDuration;
+    private String emailToken;
 
     public EmailRequest setUserName(String userName) {
         this.userName = userName;
@@ -47,5 +48,10 @@ public class EmailRequest {
 
     public static EmailRequest create(){
         return new EmailRequest();
+    }
+
+    public EmailRequest setEmailToken(String emailToken) {
+        this.emailToken = emailToken;
+        return this;
     }
 }
