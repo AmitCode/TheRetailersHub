@@ -112,4 +112,12 @@ public class UserController {
         return userService.forgotPasswordRequest(userEmailId);
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(
+            @RequestHeader String token,
+            @RequestHeader String newPassword
+    ){
+        return userService.forgetPassword(token, newPassword);
+    }
+
 }

@@ -20,6 +20,7 @@ public class OtpEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long recordId;
     private long userId;
+    private String userName;
     private String userEmail;
     private String otp;
     @Enumerated(EnumType.STRING)
@@ -85,6 +86,11 @@ public class OtpEntity {
 
     public OtpEntity setOtpValidDurationUnit(String otpValidDurationUnit) {
         this.otpValidDurationUnit = otpValidDurationUnit;
+        return this;
+    }
+
+    public OtpEntity setUserName(String userName) {
+        this.userName = userName;
         return this;
     }
 }

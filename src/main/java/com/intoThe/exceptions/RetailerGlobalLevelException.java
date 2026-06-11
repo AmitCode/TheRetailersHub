@@ -227,4 +227,13 @@ public class RetailerGlobalLevelException{
                 webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(OtpValidationException.class)
+    public ResponseEntity<RetailerExceptionResponse> otpValidationException(
+            PasswordMismatchException exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.BAD_REQUEST);
+    }
+
 }

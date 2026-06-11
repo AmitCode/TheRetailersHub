@@ -22,6 +22,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +48,9 @@ public class UserServiceImpl implements UserService {
     //private final RestTemplate restTemplate;
     private final UserDataModelMapper userModelMapper = new UserDataModelMapper();
     AuthenticationServiceResponse response;
+
+    @Value("${verification.token.expiry.time.unit}")
+    private String verificationExpiryTimeUnit;
 
     //@Autowired ----> // @Autowired needed — ONLY ONE constructor
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
@@ -389,11 +393,11 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
 
     @Transactional
     @Override
-    public ResponseEntity<AuthenticationServiceResponse> forgotPasswordRequest(String userEmailId){
-        try{
+    public ResponseEntity<AuthenticationServiceResponse> forgotPasswordRequest(String userEmailId) {
+        try {
             Optional<Users> usersOptional = userRepository.findByUserEmail(userEmailId);
 
-            if(usersOptional.isPresent()){
+            if (usersOptional.isPresent()) {
 
                 Users users = usersOptional.get();
                 String otp = OtpUtils.generateOtp();
@@ -401,7 +405,8 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
                         .setUserId(users.getUserId())
                         .setOtpTypes(OtpTypes.EMAIL_OTP_VERIFICATION)
                         .setOpt(otp)
-                        .setUserEmail(userEmailId);
+                        .setUserEmail(userEmailId)
+                        .setUserName(users.getUserName());
 
                 otpRepository.save(otpEntity);
                 EmailRequest emailRequest = AuthServiceUtils.prepareSendOtpEmailRequest(otp,
@@ -412,10 +417,10 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
                 );
             }
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw new InternalServerErrorException("[Forgot Password Request] Exception occurred Ex-"
                     + exception.getMessage());
-        }finally {
+        } finally {
             response = AuthenticationServiceResponse.createResponse()
                     .setResponseMsg("If the email exists, OTP has been sent.")
                     .setIsOprSuccess(true)
@@ -424,4 +429,32 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional
+    @Override
+    public ResponseEntity<AuthenticationServiceResponse> forgetPassword(String token, String newPassword){
+        try{
+            Optional<EntityVerificationToken> verificationToken = tokenRepository.findByVerificationToken(token);
+            if(verificationToken.isEmpty())
+                throw new VerificationTokenException("Invalid verification token!...");
+
+            EntityVerificationToken storedToken = verificationToken.get();
+            if(VerificationTokenUtils.isTokenExpired(storedToken.getTokenGeneratedAt(), verificationExpiryTimeUnit))
+                throw new VerificationTokenExpired("Verification token has expired!...");
+
+            String sqlScript = "UPDATE INTO_USER_DATA SET PASSWORD = ?  WHERE USER_ID = ?";
+            Query query = entityManager.createNativeQuery(sqlScript);
+            entityManager.setProperty(passwordEncoder.encode(newPassword),
+                    storedToken.getUserId());
+            query.executeUpdate();
+
+            return new ResponseEntity<>(AuthenticationServiceResponse.createResponse()
+                    .setResponseMsg("Password has changed successfully!...")
+                    .setStatusCode(HttpStatus.ACCEPTED.toString())
+                    .setIsOprSuccess(true), HttpStatus.OK);
+
+        }catch (Exception exception){
+            throw new InternalServerErrorException("[Exception occurred while password change]- " +
+                    "{Ex}:- " + exception.getMessage());
+        }
+    }
 }
