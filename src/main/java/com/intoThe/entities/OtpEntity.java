@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class OtpEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,13 +29,11 @@ public class OtpEntity {
     private OtpTypes otpTypes;
     @CreationTimestamp
     private LocalDateTime otpGeneratedAt;
-    @Value("${otp.retry.count}")
     private int optRetry;
-    @Value("${otp.expiry.time.duration}")
     private int otpValidDuration;
-    @Value("${otp.expiry.time.duration.unit}")
     private String otpValidDurationUnit;
     private boolean isVerified;
+    private boolean isValid = true;
 
     public static OtpEntity getOtpEntity(){
         return new OtpEntity();
@@ -93,4 +93,11 @@ public class OtpEntity {
         this.userName = userName;
         return this;
     }
+
+    public OtpEntity setIsOtpVerified(boolean isVerified) {
+        this.isVerified = true;
+        return this;
+    }
+
+
 }

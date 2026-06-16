@@ -5,9 +5,10 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class CustomDateTime {
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
 
     public static long findTheDifferenceInMinutes(LocalDateTime date) throws Exception{
+        System.out.println("Min");
         Date startDate = dateFormat.parse(date.toString());
         Date endDate = dateFormat.parse(LocalDateTime.now().toString());
         long diffInTime = endDate.getTime() - startDate.getTime();

@@ -1,5 +1,6 @@
 package com.intoThe.entities;
 
+import com.intoThe.enums.TokenExpirationUnit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,10 +24,8 @@ public class EntityVerificationToken {
     private Boolean isVerified;
     @CreationTimestamp
     private LocalDateTime tokenGeneratedAt;
-    @Value("${verification.token.expiry.time}")
     private int tokenValidDuration;
-    @Value("${verification.token.expiry.time.unit}")
-    private int tokenValidDurationUnit;
+    private TokenExpirationUnit tokenValidDurationUnit;
 
     public EntityVerificationToken() {
         this(false);
@@ -72,6 +71,11 @@ public class EntityVerificationToken {
 
     public EntityVerificationToken setTokenValidDuration(int tokenValidDuration) {
         this.tokenValidDuration = tokenValidDuration;
+        return this;
+    }
+
+    public EntityVerificationToken setTokenValidDurationUnit(TokenExpirationUnit tokenValidDurationUnit) {
+        this.tokenValidDurationUnit = tokenValidDurationUnit;
         return this;
     }
 }

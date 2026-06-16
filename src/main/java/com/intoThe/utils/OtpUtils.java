@@ -1,5 +1,10 @@
 package com.intoThe.utils;
 
+import com.intoThe.entities.OtpEntity;
+import com.intoThe.repository.OtpRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.security.SecureRandom;
 
 public class OtpUtils {
@@ -12,5 +17,10 @@ public class OtpUtils {
         return String.valueOf(otp);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public static void incrementRetry(OtpEntity otp, OtpRepository otpRepository) {
+        otp.setOptRetry(otp.getOptRetry() + 1);
+        otpRepository.save(otp);
+    }
 
 }

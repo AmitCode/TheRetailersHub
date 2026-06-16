@@ -4,6 +4,7 @@ import com.intoThe.dto.request.UserLoginRequest;
 import com.intoThe.dto.response.UserLoginResponse;
 import com.intoThe.entities.Users;
 import com.intoThe.exceptions.SuppliersOprException.InvalidCredentials;
+import com.intoThe.exceptions.SuppliersOprException.ResourceNotFoundException;
 import com.intoThe.exceptions.SuppliersOprException.UserInactiveException;
 import com.intoThe.exceptions.SuppliersOprException.UserNameNotFound;
 import com.intoThe.repository.UserRepository;
@@ -25,26 +26,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserLoginResponse userLogin(UserLoginRequest loginRequest) {
+    public void userLogin(UserLoginRequest loginRequest) {
         UserLoginResponse userLoginResponse = new UserLoginResponse();
 
         System.out.println(loginRequest.getUserName());
-        Optional<Users> user = userRepository.findByUserName(loginRequest.getUserName());
-        if(user.isEmpty()){
-            throw new UserNameNotFound("User not found!");
-        }else if(user.get().getIsUserActive()){
-            throw new UserInactiveException("User account is inactive");
-        }
+        Users user = userRepository.findByUserName(loginRequest.getUserName())
+                .orElseThrow(()-> new ResourceNotFoundException("User not found!"));
 
-        Users users = user.get();
+        checkIsUserActive(user);
+        checkPassword(user, loginRequest);
+    }
+
+    private void checkIsUserActive(Users user){
+        if(!user.getIsUserActive())
+            throw new UserInactiveException("User account is inactive");
+    }
+
+    private void checkPassword(Users user, UserLoginRequest loginRequest){
         boolean isPasswordMatched = passwordEncoder.matches(
                 loginRequest.getPassword(),
-                users.getPassword()
+                user.getPassword()
         );
         if(!isPasswordMatched){
             throw new InvalidCredentials("Invalid Credentials!");
         }
-        return userLoginResponse;
     }
 
 

@@ -2,7 +2,7 @@ package com.intoThe.utils;
 
 import com.intoThe.entities.Users;
 import com.intoThe.exceptions.SuppliersOprException.EmailIdAlreadyExist;
-import com.intoThe.exceptions.SuppliersOprException.ResourceNotFound;
+import com.intoThe.exceptions.SuppliersOprException.ResourceNotFoundException;
 import com.intoThe.exceptions.SuppliersOprException.SuppliersOprExceptionHandler;
 import com.intoThe.repository.UserRepository;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class UserUtils {
     public static Users isUserExist(String userName, UserRepository userRepository) {
 
         return userRepository.findByUserName(userName)
-                .orElseThrow(() -> (new ResourceNotFound("User with this id :" + userName + " not found!...")));
+                .orElseThrow(() -> (new ResourceNotFoundException("User with this id :" + userName + " not found!...")));
     }
 
     /**

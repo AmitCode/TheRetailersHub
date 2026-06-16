@@ -5,8 +5,9 @@ import com.intoThe.dto.response.AuthenticationServiceResponse;
 import com.intoThe.dto.response.EmailServiceResponse;
 import com.intoThe.entities.EntityVerificationToken;
 import com.intoThe.entities.Users;
+import com.intoThe.enums.TokenExpirationUnit;
 import com.intoThe.exceptions.SuppliersOprException.InvalidToken;
-import com.intoThe.exceptions.SuppliersOprException.ResourceNotFound;
+import com.intoThe.exceptions.SuppliersOprException.ResourceNotFoundException;
 import com.intoThe.exceptions.SuppliersOprException.VerificationTokenException;
 import com.intoThe.exceptions.SuppliersOprException.VerificationTokenExpired;
 import com.intoThe.mapper.UserDataModelMapper;
@@ -36,7 +37,9 @@ public class TokenVerificationService {
     private final WebClient notificationServiceWebClient;
 
     @Value("${verification.token.expiry.time.unit}")
-    private String verificationExpiryTimeUnit;
+    private TokenExpirationUnit verificationExpiryTimeUnit;
+    @Value("${verification.token.expiry.time}")
+    private int tokenValidDuration;
 
     public TokenVerificationService(EntityVerificationTokenRepository verificationTokenRepository,
                                     UserRepository userRepository,
@@ -62,13 +65,13 @@ public class TokenVerificationService {
             throw new VerificationTokenException("User already verified!...");
         }
 
-        if(VerificationTokenUtils. isTokenExpired(entityVerificationToken.getTokenGeneratedAt(), verificationExpiryTimeUnit)){
+        if(VerificationTokenUtils.isTokenExpired(entityVerificationToken.getTokenGeneratedAt(), String.valueOf(entityVerificationToken.getTokenValidDurationUnit()))){
             throw new VerificationTokenExpired("Token has expired!...");
         }
 
         Optional<Users> usersOptional = userRepository.findByUserId(entityVerificationToken.getUserId());
         if(usersOptional.isEmpty())
-            throw new ResourceNotFound("No User is not found with user id associated with this verification " +
+            throw new ResourceNotFoundException("No User is not found with user id associated with this verification " +
                     "token!...");
 
         Users users = usersOptional.get();
@@ -93,7 +96,8 @@ public class TokenVerificationService {
                     String token = VerificationTokenUtils.generateVerificationToken();
                     String hashToken = HashUtils.getSHA256Hash(token);
                     EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
-                            hashToken, "SHA-256", users.getUserId(), users.getUserName()
+                            hashToken, "SHA-256", users.getUserId(), users.getUserName(),
+                            tokenValidDuration, verificationExpiryTimeUnit
                     );
 
                     verificationTokenRepository.save(verificationToken);

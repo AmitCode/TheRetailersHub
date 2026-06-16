@@ -1,8 +1,8 @@
 package com.intoThe.exceptions.SuppliersOprException;
 
-public class OtpValidationException extends RuntimeException{
+public class AccountInactiveException extends RuntimeException{
     String message;
-    public OtpValidationException(String message){
+    public AccountInactiveException(String message){
         super(message);
         this.message = message;
     }

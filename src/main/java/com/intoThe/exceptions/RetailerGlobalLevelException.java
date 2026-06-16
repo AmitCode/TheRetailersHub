@@ -6,6 +6,7 @@ import com.intoThe.exceptions.SuppliersOprException.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -60,10 +61,10 @@ public class RetailerGlobalLevelException{
     }
 
     /**
-     * This method is used to handle {@link ResourceNotFound} exceptions thrown during the execution of any of the
+     * This method is used to handle {@link ResourceNotFoundException} exceptions thrown during the execution of any of the
      * {@link UserController} methods.
      *
-     * @param resourceNotFound The {@link ResourceNotFound} exception to be handled.
+     * @param resourceNotFound The {@link ResourceNotFoundException} exception to be handled.
      * @param request The {@link WebRequest} object containing information about the request that caused the exception.
      *
      * @return A {@link ResponseEntity} containing a {@link RetailerExceptionResponse} object with the HTTP status code
@@ -71,8 +72,8 @@ public class RetailerGlobalLevelException{
      *         and the description of the request that caused the exception.
      */
 
-    @ExceptionHandler(ResourceNotFound.class)
-    public ResponseEntity<RetailerExceptionResponse> supplierNotFound(ResourceNotFound resourceNotFound,
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<RetailerExceptionResponse> supplierNotFound(ResourceNotFoundException resourceNotFound,
                                                                       WebRequest request){
         return new ResponseEntity<>(new RetailerExceptionResponse(HttpStatus.NOT_FOUND.value(),
                 resourceNotFound.getMessage(),request.getDescription(false)),
@@ -229,11 +230,31 @@ public class RetailerGlobalLevelException{
 
     @ExceptionHandler(OtpValidationException.class)
     public ResponseEntity<RetailerExceptionResponse> otpValidationException(
-            PasswordMismatchException exception, WebRequest webRequest) {
+            OtpValidationException exception, WebRequest webRequest) {
+        System.out.println("Message: " +exception.getMessage());
         return new ResponseEntity<>(new RetailerExceptionResponse(
                 HttpStatus.FORBIDDEN.value(),
                 exception.getMessage(),
-                webRequest.getDescription(false)),HttpStatus.BAD_REQUEST);
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AccountInactiveException .class)
+    public ResponseEntity<RetailerExceptionResponse> accountInactiveException(
+            AccountInactiveException exception, WebRequest webRequest) {
+        System.out.println("Message: " +exception.getMessage());
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<RetailerExceptionResponse> badCredentialsException(
+            BadCredentialsException exception, WebRequest webRequest) {
+        return new ResponseEntity<>(new RetailerExceptionResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                exception.getMessage(),
+                webRequest.getDescription(false)),HttpStatus.UNAUTHORIZED);
     }
 
 }

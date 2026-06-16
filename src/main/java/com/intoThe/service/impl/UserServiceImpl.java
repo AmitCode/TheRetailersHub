@@ -9,6 +9,7 @@ import com.intoThe.entities.EntityVerificationToken;
 import com.intoThe.entities.OtpEntity;
 import com.intoThe.entities.Users;
 import com.intoThe.enums.OtpTypes;
+import com.intoThe.enums.TokenExpirationUnit;
 import com.intoThe.exceptions.SuppliersOprException.*;
 import com.intoThe.mapper.UserDataModelMapper;
 import com.intoThe.mapper.VerificationTokenModelMapper;
@@ -50,7 +51,9 @@ public class UserServiceImpl implements UserService {
     AuthenticationServiceResponse response;
 
     @Value("${verification.token.expiry.time.unit}")
-    private String verificationExpiryTimeUnit;
+    private TokenExpirationUnit verificationExpiryTimeUnit;
+    @Value("${verification.token.expiry.time}")
+    private int tokenValidDuration;
 
     //@Autowired ----> // @Autowired needed — ONLY ONE constructor
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
@@ -184,7 +187,8 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             String token = VerificationTokenUtils.generateVerificationToken();
             String hashToken = HashUtils.getSHA256Hash(token);
             EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
-                    hashToken, "SHA-256", newUser.getUserId(), newUser.getUserName()
+                    hashToken, "SHA-256", newUser.getUserId(), newUser.getUserName(),
+                    tokenValidDuration, verificationExpiryTimeUnit
             );
 
             tokenRepository.save(verificationToken);
@@ -333,7 +337,8 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             if(usersOptional.isPresent()){
                 Users users = usersOptional.get();
                 EntityVerificationToken verificationToken = VerificationTokenModelMapper.getVerificationToken(
-                        hashToken, "SHA-256", users.getUserId(), users.getUserName()
+                        hashToken, "SHA-256", users.getUserId(), users.getUserName(),
+                        tokenValidDuration, verificationExpiryTimeUnit
                 );
                 tokenRepository.save(verificationToken);
 
@@ -366,7 +371,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
             EntityVerificationToken verificationTokenInfo = tokenOptional.get();
             Optional<Users> usersOptional = userRepository.findByUserId(verificationTokenInfo.getUserId());
             if(usersOptional.isEmpty())
-                throw new ResourceNotFound("User not found with userId associated with token!...");
+                throw new ResourceNotFoundException("User not found with userId associated with token!...");
 
             Users users = usersOptional.get();
             boolean isPasswordMatched = passwordEncoder.matches(users.getPassword(),
@@ -403,7 +408,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
                 String otp = OtpUtils.generateOtp();
                 OtpEntity otpEntity = OtpEntity.getOtpEntity()
                         .setUserId(users.getUserId())
-                        .setOtpTypes(OtpTypes.EMAIL_OTP_VERIFICATION)
+                        .setOtpTypes(OtpTypes.FORGET_PASSWORD_OTP_VERIFICATION)
                         .setOpt(otp)
                         .setUserEmail(userEmailId)
                         .setUserName(users.getUserName());
@@ -438,7 +443,7 @@ public ResponseEntity<?> addUser(UserDTO userDTO) {
                 throw new VerificationTokenException("Invalid verification token!...");
 
             EntityVerificationToken storedToken = verificationToken.get();
-            if(VerificationTokenUtils.isTokenExpired(storedToken.getTokenGeneratedAt(), verificationExpiryTimeUnit))
+            if(VerificationTokenUtils.isTokenExpired(storedToken.getTokenGeneratedAt(), String.valueOf(storedToken.getTokenValidDurationUnit())))
                 throw new VerificationTokenExpired("Verification token has expired!...");
 
             String sqlScript = "UPDATE INTO_USER_DATA SET PASSWORD = ?  WHERE USER_ID = ?";

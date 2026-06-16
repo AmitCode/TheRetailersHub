@@ -2,6 +2,7 @@ package com.intoThe.enums;
 
 public enum OtpTypes {
     PASSWORD_RESET,
+    FORGET_PASSWORD_OTP_VERIFICATION,
     EMAIL_OTP_VERIFICATION,
     MOBILE_OTP_VERIFICATION
 }
